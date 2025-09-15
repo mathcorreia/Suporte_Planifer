@@ -28,7 +28,7 @@
           <div class="col-md-4"><label class="form-label">Cód. Solicitante</label><input type="number" name="solicitante" class="form-control" required></div>
           <div class="col-md-8"><label class="form-label">TAG do Ativo</label><input type="text" name="ativo_tag" class="form-control" required></div>
           <div class="col-12"><label class="form-label">Descrição do Problema</label><textarea name="descricao_problema" class="form-control" rows="3" required></textarea></div>
-          <div class="col-12"><div class="form-check form-switch"><input class="form-check-input" type="checkbox" name="maquina_parada" id="maquina_parada"><label class="form-check-label" for="maquina_parada">Máquina parada?</label></div></div>
+          <div class="col-12"><div class="form-check form-switch"><input class="form-check-input" type="checkbox" name="maquina_parada" value="1" id="maquina_parada"><label class="form-check-label" for="maquina_parada">Máquina parada?</label></div></div>
         </form>
       </div>
       <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button><button type="submit" form="formNovaOSS" class="btn btn-primary">Salvar</button></div>
@@ -70,20 +70,26 @@ $(document).ready(function() {
 
   $('#formNovaOSS').submit(function(e) {
       e.preventDefault();
-      const payload = $(this).serialize() + '&action=create';
-      $.post('ordem_servico_actions.php', payload, function(res) {
-          alert(res.mensagem || res.erro);
-          if(res.sucesso) {
-              $('#modalNovaOSS').modal('hide');
-              $('#formNovaOSS')[0].reset();
-              carregarOSS();
-          }
-      }, 'json');
+      $.ajax({
+          url: 'ordem_servico_actions.php', type: 'POST', data: $(this).serialize() + '&action=create', dataType: 'json',
+          success: function(res) {
+              if (res.sucesso) {
+                  alert(res.mensagem);
+                  $('#modalNovaOSS').modal('hide');
+                  $('#formNovaOSS')[0].reset();
+                  carregarOSS();
+              } else {
+                  let errorMsg = res.mensagem || res.erro || "Ocorreu um erro desconhecido.";
+                  if (res.details && res.details[0]) { errorMsg += "\nDetalhes: " + res.details[0].message; }
+                  alert(errorMsg);
+              }
+          },
+          error: function(jqXHR) { alert("Falha grave: " + jqXHR.responseText); }
+      });
   });
 
   carregarOSS();
 });
 </script>
-
 </body>
 </html>

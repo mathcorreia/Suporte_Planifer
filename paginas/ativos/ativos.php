@@ -21,7 +21,8 @@
         <div class="col-md-4"><label class="form-label">Número de Série</label><input type="text" name="numero_serie" class="form-control"></div>
         <div class="col-md-4">
           <label class="form-label">Setor</label>
-          <select name="setor_tag" class="form-select" required></select> </div>
+          <select name="setor_tag" class="form-select" required></select>
+        </div>
         <div class="col-md-4"><label class="form-label">Tipo</label><select name="tipo" class="form-select"><option value="">Selecione...</option><option value="TCNC">TCNC</option><option value="FCNC">FCNC</option><option value="MANUAL">MANUAL</option><option value="INFO">INFO</option><option value="PREDIAL">PREDIAL</option><option value="MAQUINA">MAQUINA</option><option value="OUTRO">OUTRO</option></select></div>
         <div class="col-12"><button type="submit" class="btn btn-primary">Salvar</button><button type="button" class="btn btn-secondary" id="btnNovo">Novo</button></div>
       </form>
@@ -41,7 +42,7 @@ $(document).ready(function() {
   let tabela;
 
   function carregarSetoresDropdown() {
-      $.post('../setores/setores_actions.php', { action: 'get' }, function(data) {
+      $.post('../Setores/setores_actions.php', { action: 'get' }, function(data) {
           const select = $('select[name="setor_tag"]');
           select.empty().append('<option value="">Selecione um setor...</option>');
           if(Array.isArray(data)) {
@@ -65,8 +66,54 @@ $(document).ready(function() {
     }, 'json');
   }
 
-  $('#formAtivo').submit(function(e) { e.preventDefault(); /* ... o resto do seu código de submit ... */ });
-  // ... (o resto do seu JavaScript para Ativos continua aqui) ...
+  $('#formAtivo').submit(function(e) {
+    e.preventDefault();
+    $.ajax({
+        url: 'ativos_actions.php', type: 'POST', data: $(this).serialize() + '&action=save', dataType: 'json',
+        success: function(res) {
+            if (res.sucesso) {
+                alert(res.mensagem);
+                carregarAtivos();
+                limparFormulario();
+            } else {
+                let errorMsg = res.mensagem || res.erro || "Ocorreu um erro desconhecido.";
+                if (res.details && res.details[0]) { errorMsg += "\nDetalhes: " + res.details[0].message; }
+                alert(errorMsg);
+            }
+        },
+        error: function(jqXHR) { alert("Falha grave: " + jqXHR.responseText); }
+    });
+  });
+
+  $('#ativosTable tbody').on('click', 'tr', function () {
+    const ativo = $(this).closest('tr').data('ativo');
+    if (ativo) {
+      $('input[name="id_original"]').val(ativo.id);
+      $('input[name="ativo_tag"]').val(ativo.ativo_tag);
+      $('input[name="descricao"]').val(ativo.descricao);
+      $('input[name="modelo"]').val(ativo.modelo);
+      $('input[name="numero_serie"]').val(ativo.numero_serie);
+      $('select[name="setor_tag"]').val(ativo.setor_tag);
+      $('select[name="tipo"]').val(ativo.tipo);
+    }
+  });
+
+  $('#ativosTable tbody').on('click', '.btn-apagar', function (e) {
+    e.stopPropagation();
+    const id = $(this).data('id');
+    if (confirm(`Deseja realmente apagar este ativo?`)) {
+      $.post('ativos_actions.php', { action: 'delete', id: id }, function (res) {
+        alert(res.mensagem || res.erro);
+        if(res.sucesso) carregarAtivos();
+      }, 'json');
+    }
+  });
+  
+  $('#btnNovo').on('click', limparFormulario);
+  function limparFormulario() {
+      $('#formAtivo')[0].reset();
+      $('input[name="id_original"]').val('');
+  }
 
   carregarSetoresDropdown();
   carregarAtivos();

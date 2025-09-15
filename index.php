@@ -27,7 +27,8 @@
   <hr style="border-color: #6c757d;">
   <small style="padding: 10px 20px; color: #6c757d; text-transform: uppercase;">Cadastros</small>
   <a onclick="carregarModulo('Ativos')" id="menuAtivos">Ativos</a>
-  <a onclick="carregarModulo('Setores')" id="menuSetores">Setores</a> <a onclick="carregarModulo('Usuarios')" id="menuUsuarios">Usuários</a>
+  <a onclick="carregarModulo('Setores')" id="menuSetores">Setores</a>
+  <a onclick="carregarModulo('Usuarios')" id="menuUsuarios">Usuários</a>
   <a onclick="carregarModulo('Tarefas')" id="menuTarefas">Tarefas</a>
 </div>
 
@@ -43,7 +44,7 @@ function carregarModulo(modulo) {
     OS: { titulo: "Ordens de Serviço de Suporte", path: "paginas/OS/ordem_servico.php" },
     Relatorios: { titulo: "Relatórios do Sistema", path: "paginas/Relatorios/relatorios.php" },
     Ativos: { titulo: "Cadastro de Ativos", path: "paginas/Ativos/ativos.php" },
-    Setores: { titulo: "Cadastro de Setores", path: "paginas/Setores/setores.php" }, // NOVO MÓDULO
+    Setores: { titulo: "Cadastro de Setores", path: "paginas/Setores/setores.php" },
     Usuarios: { titulo: "Gestão de Usuários", path: "paginas/Usuarios/usuarios.php" },
     Tarefas: { titulo: "Cadastro de Tarefas", path: "paginas/Tarefas/tarefas.php" }
   };

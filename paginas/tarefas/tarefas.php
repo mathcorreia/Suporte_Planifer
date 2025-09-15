@@ -47,17 +47,28 @@ $(document).ready(function() {
       }
     }, 'json');
   }
+
   $('#formTarefa').submit(function(e) {
     e.preventDefault();
-    $.post('tarefas_actions.php', $(this).serialize() + '&action=save', function(res) {
-      alert(res.mensagem || res.erro || "Erro desconhecido");
-      if(res.mensagem) { carregarTarefas(); limparFormulario(); }
-    }, 'json');
+    $.ajax({
+        url: 'tarefas_actions.php', type: 'POST', data: $(this).serialize() + '&action=save', dataType: 'json',
+        success: function(res) {
+            if (res.sucesso) {
+                alert(res.mensagem);
+                carregarTarefas();
+                limparFormulario();
+            } else {
+                let errorMsg = res.mensagem || res.erro || "Ocorreu um erro desconhecido.";
+                if (res.details && res.details[0]) { errorMsg += "\nDetalhes: " + res.details[0].message; }
+                alert(errorMsg);
+            }
+        },
+        error: function(jqXHR) { alert("Falha grave: " + jqXHR.responseText); }
+    });
   });
+
   $('#tarefasTable tbody').on('click', 'tr', function () {
-    $('#tarefasTable tbody tr').removeClass('selected');
-    $(this).addClass('selected');
-    const tarefa = $(this).data('tarefa');
+    const tarefa = $(this).closest('tr').data('tarefa');
     if (tarefa) {
       $('input[name="tarefa_codigo"]').val(tarefa.tarefa_codigo);
       $('input[name="tarefa_tag"]').val(tarefa.tarefa_tag);
@@ -66,22 +77,23 @@ $(document).ready(function() {
       $('input[name="ultima_execucao"]').val(tarefa.ultima_execucao ? tarefa.ultima_execucao.split(' ')[0] : '');
     }
   });
+
   $('#tarefasTable tbody').on('click', '.btn-apagar', function (e) {
     e.stopPropagation();
     const id = $(this).data('id');
     const tag = $(this).data('tag');
     if (confirm(`Deseja realmente apagar a tarefa "${tag}"?`)) {
       $.post('tarefas_actions.php', { action: 'delete', id: id }, function (res) {
-        alert(res.mensagem || res.erro || "Erro ao apagar.");
-        if(res.mensagem) carregarTarefas();
+        alert(res.mensagem || res.erro);
+        if(res.sucesso) carregarTarefas();
       }, 'json');
     }
   });
+
   $('#btnNovo').on('click', limparFormulario);
   function limparFormulario() {
     $('#formTarefa')[0].reset();
     $('input[name="tarefa_codigo"]').val('');
-    $('#tarefasTable tbody tr').removeClass('selected');
   }
   carregarTarefas();
 });

@@ -1,13 +1,10 @@
 <?php
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
-
-// Caminho corrigido para a raiz
-require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/database/config.php';
 header('Content-Type: application/json');
 
 $stats = [];
-
 $sql_ativos = "SELECT COUNT(id) as total FROM SGM_Ativos";
 $stmt_ativos = sqlsrv_query($conn, $sql_ativos);
 if ($stmt_ativos === false) { die(json_encode(["erro" => "Erro na consulta de ativos.", "details" => sqlsrv_errors()])); }

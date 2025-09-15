@@ -14,6 +14,7 @@
   <div class="card mb-4">
     <div class="card-body">
       <form id="formSetor" class="row g-3">
+        <input type="hidden" name="setor_tag_original">
         <div class="col-md-4"><label class="form-label">TAG do Setor</label><input type="text" name="setor_tag" class="form-control" required></div>
         <div class="col-md-8"><label class="form-label">Descrição do Setor</label><input type="text" name="descricao" class="form-control" required></div>
         <div class="col-12"><button type="submit" class="btn btn-primary">Salvar</button><button type="button" class="btn btn-secondary" id="btnNovo">Novo</button></div>
@@ -50,8 +51,15 @@ $(document).ready(function() {
     $.ajax({
         url: 'setores_actions.php', type: 'POST', data: $(this).serialize() + '&action=save', dataType: 'json',
         success: function(res) {
-            alert(res.mensagem || res.erro);
-            if (res.sucesso) { carregarSetores(); limparFormulario(); }
+            if (res.sucesso) {
+                alert(res.mensagem);
+                carregarSetores();
+                limparFormulario();
+            } else {
+                let errorMsg = res.mensagem || res.erro || "Ocorreu um erro desconhecido.";
+                if (res.details && res.details[0]) { errorMsg += "\nDetalhes: " + res.details[0].message; }
+                alert(errorMsg);
+            }
         },
         error: function(jqXHR) { alert("Falha grave: " + jqXHR.responseText); }
     });
@@ -60,7 +68,8 @@ $(document).ready(function() {
   $('#setoresTable tbody').on('click', 'tr', function () {
     const setor = $(this).closest('tr').data('setor');
     if (setor) {
-      $('input[name="setor_tag"]').val(setor.setor_tag).prop('readonly', true);
+      $('input[name="setor_tag_original"]').val(setor.setor_tag);
+      $('input[name="setor_tag"]').val(setor.setor_tag);
       $('input[name="descricao"]').val(setor.descricao);
     }
   });
@@ -79,7 +88,7 @@ $(document).ready(function() {
   $('#btnNovo').on('click', limparFormulario);
   function limparFormulario() {
       $('#formSetor')[0].reset();
-      $('input[name="setor_tag"]').prop('readonly', false);
+      $('input[name="setor_tag_original"]').val('');
   }
   carregarSetores();
 });

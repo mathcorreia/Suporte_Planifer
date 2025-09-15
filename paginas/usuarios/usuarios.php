@@ -60,27 +60,25 @@ $(document).ready(function() {
 
   $('#formUsuario').submit(function(e) {
     e.preventDefault();
-    const payload = $(this).serialize() + '&action=save';
-    $.post('usuarios_actions.php', payload, function(res) {
-        if (res.sucesso) {
-            alert(res.mensagem);
-            carregarUsuarios();
-            limparFormulario();
-        } else {
-            let errorMsg = res.mensagem || res.erro || "Erro desconhecido";
-            if (res.details) {
-                // Formata o erro do SQL Server para ser mais legível
-                errorMsg += "\\nDetalhes: " + JSON.stringify(res.details[0].message);
+    $.ajax({
+        url: 'usuarios_actions.php', type: 'POST', data: $(this).serialize() + '&action=save', dataType: 'json',
+        success: function(res) {
+            if (res.sucesso) {
+                alert(res.mensagem);
+                carregarUsuarios();
+                limparFormulario();
+            } else {
+                let errorMsg = res.mensagem || res.erro || "Ocorreu um erro desconhecido.";
+                if (res.details && res.details[0]) { errorMsg += "\nDetalhes: " + res.details[0].message; }
+                alert(errorMsg);
             }
-            alert(errorMsg);
-        }
-    }, 'json');
+        },
+        error: function(jqXHR) { alert("Falha grave: " + jqXHR.responseText); }
+    });
   });
 
   $('#usuariosTable tbody').on('click', 'tr', function () {
-    $('#usuariosTable tbody tr').removeClass('selected');
-    $(this).addClass('selected');
-    const usuario = $(this).data('usuario');
+    const usuario = $(this).closest('tr').data('usuario');
     if (usuario) {
       $('input[name="codigo_original"]').val(usuario.codigo);
       $('input[name="codigo"]').val(usuario.codigo).prop('readonly', true);
@@ -105,12 +103,10 @@ $(document).ready(function() {
   });
 
   $('#btnNovo').on('click', limparFormulario);
-
   function limparFormulario() {
     $('#formUsuario')[0].reset();
     $('input[name="codigo_original"]').val('');
     $('input[name="codigo"]').prop('readonly', false);
-    $('#usuariosTable tbody tr').removeClass('selected');
   }
   carregarUsuarios();
 });
