@@ -1,9 +1,13 @@
--- Cria o Schema (a "pasta") se ele ainda não existir
+-- PASSO 1: Criar o Schema
+-- Se este comando falhar, o utilizador 'root' pode não ter permissão.
+-- O nome do schema é "SISTEMAS_SUPORTE" (no plural).
 IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = 'SISTEMAS_SUPORTE')
 BEGIN
     EXEC('CREATE SCHEMA SISTEMAS_SUPORTE');
 END
 GO
+
+-- PASSO 2: Criar todas as tabelas dentro do Schema
 
 -- Tabela de Status para as Ordens de Serviço
 IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[SISTEMAS_SUPORTE].[SGM_TAGStatus]') AND type in (N'U'))
@@ -12,7 +16,6 @@ CREATE TABLE [SISTEMAS_SUPORTE].SGM_TAGStatus (
     TAGStatusID INT IDENTITY(1,1) PRIMARY KEY,
     TAGStatus NVARCHAR(50) NOT NULL
 );
--- Popula a tabela de Status
 INSERT INTO [SISTEMAS_SUPORTE].SGM_TAGStatus (TAGStatus) VALUES
 ('Aguardando Análise'), ('Aguardando Técnico'), ('Aguardando Terceiros'),
 ('Aguardando Peça'), ('Aguardando Liberação'), ('Aguardando Aprovação'),
@@ -52,7 +55,7 @@ END
 GO
 
 -- Tabela de Tarefas
-IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[SISTEMAS_SUPORTE].[SGM_Tarefas]') AND type in (N'U'))
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[SISTEMAS_SUPOPRTE].[SGM_Tarefas]') AND type in (N'U'))
 BEGIN
 CREATE TABLE [SISTEMAS_SUPORTE].SGM_Tarefas (
     tarefa_codigo INT IDENTITY(1,1) PRIMARY KEY,
