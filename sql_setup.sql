@@ -13,7 +13,7 @@ INSERT INTO SGM_TAGStatus (TAGStatus) VALUES
 END
 GO
 
--- Garante que a tabela SGM_Usuarios exista
+-- Garante que a tabela SGM_Usuarios exista (sem senha)
 IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[SGM_Usuarios]') AND type in (N'U'))
 BEGIN
 CREATE TABLE SGM_Usuarios (
@@ -28,19 +28,10 @@ CREATE TABLE SGM_Usuarios (
 END
 GO
 
--- Adiciona a coluna 'senha' à tabela SGM_Usuarios se ela não existir
-IF NOT EXISTS (SELECT * FROM sys.columns WHERE Name = N'senha' AND Object_ID = Object_ID(N'SGM_Usuarios'))
+-- Remove a coluna 'senha' da tabela SGM_Usuarios se ela existir
+IF EXISTS (SELECT * FROM sys.columns WHERE Name = N'senha' AND Object_ID = Object_ID(N'SGM_Usuarios'))
 BEGIN
-    ALTER TABLE SGM_Usuarios ADD senha NVARCHAR(255) NOT NULL DEFAULT 'senha_padrao'; -- Use uma senha padrão temporária
-END
-GO
-
--- Adiciona um usuário administrador padrão se ele não existir
-IF NOT EXISTS (SELECT 1 FROM SGM_Usuarios WHERE codigo = 1)
-BEGIN
-    -- A senha é 'admin' (sem hash para simplicidade de inserção, ajuste conforme necessário)
-    INSERT INTO SGM_Usuarios (codigo, nome, senha, ativo, administrador)
-    VALUES (1, 'Administrador Padrão', 'admin', 1, 1);
+    ALTER TABLE SGM_Usuarios DROP COLUMN senha;
 END
 GO
 

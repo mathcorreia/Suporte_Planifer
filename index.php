@@ -1,10 +1,3 @@
-<?php
-session_start();
-if (!isset($_SESSION['usuario_codigo'])) {
-    header('Location: login.php');
-    exit;
-}
-?>
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -27,7 +20,6 @@ if (!isset($_SESSION['usuario_codigo'])) {
 <div class="sidebar">
   <div class="sidebar-header">
     <h4>Menu Principal</h4>
-    <small>Bem-vindo, <?php echo htmlspecialchars($_SESSION['usuario_nome']); ?>!</small>
   </div>
   <a onclick="carregarModulo('Dashboard')" id="menuDashboard">Dashboard</a>
   <a onclick="carregarModulo('OS')" id="menuOS">Ordens de Serviço</a>
@@ -37,8 +29,6 @@ if (!isset($_SESSION['usuario_codigo'])) {
   <a onclick="carregarModulo('Ativos')" id="menuAtivos">Ativos</a>
   <a onclick="carregarModulo('Usuarios')" id="menuUsuarios">Usuários</a>
   <a onclick="carregarModulo('Tarefas')" id="menuTarefas">Tarefas</a>
-  <hr style="border-color: #6c757d;">
-  <a href="logout.php">Sair</a>
 </div>
 
 <div class="main-content">

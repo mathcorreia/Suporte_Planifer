@@ -2,8 +2,7 @@
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
-// Caminho corrigido para a raiz do projeto 'suporte' e depois para a pasta 'database'
-require_once __DIR__ . '/../../../database/config.php';
+require_once __DIR__ . '/../../config.php';
 
 header('Content-Type: application/json');
 
@@ -33,24 +32,30 @@ if ($action === 'save') {
     $codigo_original = $_POST['codigo_original'] ?? '';
     $codigo = $_POST['codigo'] ?? '';
     $params = [
-        $_POST['nome'] ?? '',
-        $_POST['ativo'] ?? 0,
-        $_POST['cliente'] ?? 0,
-        $_POST['tecnico'] ?? 0,
-        $_POST['planejador'] ?? 0,
-        $_POST['admin'] ?? 0,
+        'nome' => $_POST['nome'] ?? '',
+        'ativo' => isset($_POST['ativo']) ? 1 : 0,
+        'cliente' => isset($_POST['cliente']) ? 1 : 0,
+        'tecnico' => isset($_POST['tecnico']) ? 1 : 0,
+        'planejador' => isset($_POST['planejador']) ? 1 : 0,
+        'admin' => isset($_POST['admin']) ? 1 : 0,
     ];
 
     if (!empty($codigo_original)) {
         $sql = "UPDATE SGM_Usuarios SET nome = ?, ativo = ?, cliente = ?, tecnico = ?, planejador = ?, administrador = ? WHERE codigo = ?";
-        $params[] = $codigo_original;
-        $stmt = sqlsrv_query($conn, $sql, $params);
-        echo json_encode(["mensagem" => $stmt ? "Utilizador atualizado com sucesso!" : "Erro ao atualizar utilizador."]);
+        $stmt = sqlsrv_query($conn, $sql, array_merge(array_values($params), [$codigo_original]));
+        if($stmt) {
+            echo json_encode(["sucesso" => true, "mensagem" => "Utilizador atualizado com sucesso!"]);
+        } else {
+            echo json_encode(["erro" => "Erro ao atualizar utilizador.", "details" => sqlsrv_errors()]);
+        }
     } else {
         $sql = "INSERT INTO SGM_Usuarios (codigo, nome, ativo, cliente, tecnico, planejador, administrador) VALUES (?, ?, ?, ?, ?, ?, ?)";
-        array_unshift($params, $codigo);
-        $stmt = sqlsrv_query($conn, $sql, $params);
-        echo json_encode(["mensagem" => $stmt ? "Utilizador cadastrado com sucesso!" : "Erro ao cadastrar utilizador."]);
+        $stmt = sqlsrv_query($conn, $sql, array_merge([$codigo], array_values($params)));
+        if($stmt) {
+            echo json_encode(["sucesso" => true, "mensagem" => "Utilizador cadastrado com sucesso!"]);
+        } else {
+            echo json_encode(["erro" => "Erro ao cadastrar utilizador. O código já pode existir.", "details" => sqlsrv_errors()]);
+        }
     }
     exit;
 }
@@ -62,7 +67,11 @@ if ($action === 'delete') {
       exit;
     }
     $stmt = sqlsrv_query($conn, "DELETE FROM SGM_Usuarios WHERE codigo = ?", [$codigo]);
-    echo json_encode(["mensagem" => $stmt ? "Utilizador apagado com sucesso!" : "Erro ao apagar utilizador."]);
+    if($stmt) {
+        echo json_encode(["sucesso" => true, "mensagem" => "Utilizador apagado com sucesso!"]);
+    } else {
+        echo json_encode(["erro" => "Erro ao apagar utilizador."]);
+    }
     exit;
 }
 

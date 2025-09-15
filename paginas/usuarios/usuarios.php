@@ -120,7 +120,7 @@ $(document).ready(function() {
 
     $.post('usuarios_actions.php', payload, function(res) {
       alert(res.mensagem || res.erro || "Erro desconhecido");
-      if (res.mensagem) {
+      if (res.sucesso) {
         carregarUsuarios();
         limparFormulario();
       }
@@ -151,7 +151,7 @@ $(document).ready(function() {
     if (confirm(`Deseja realmente apagar o utilizador de código ${codigo}?`)) {
       $.post('usuarios_actions.php', { action: 'delete', codigo: codigo }, function (res) {
         alert(res.mensagem || res.erro || "Erro ao apagar.");
-        if(res.mensagem) carregarUsuarios();
+        if(res.sucesso) carregarUsuarios();
       }, 'json');
     }
   });

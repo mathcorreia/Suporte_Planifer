@@ -1,5 +1,5 @@
 <?php
-session_start();
+// session_start(); // Removido
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
@@ -15,6 +15,7 @@ if (!$conn) {
 $action = $_POST['action'] ?? '';
 
 if ($action === 'get_open') {
+    // (O código desta ação permanece o mesmo da resposta anterior)
     $sql = "
         WITH LatestStatus AS (
             SELECT os_tag, tag_status_id, data_inicio,
@@ -40,6 +41,7 @@ if ($action === 'get_open') {
 }
 
 if ($action === 'create') {
+    // (O código desta ação permanece o mesmo da resposta anterior)
     $params = [
         'ativo_tag' => $_POST['ativo_tag'] ?? '',
         'solicitante' => $_POST['solicitante'] ?? '',
@@ -74,6 +76,7 @@ if ($action === 'create') {
 }
 
 if ($action === 'get_details') {
+    // (O código desta ação permanece o mesmo da resposta anterior)
     $os_tag = $_POST['os_tag'] ?? '';
     if (empty($os_tag)) { echo json_encode(["erro" => "OS Tag não informada."]); exit; }
 
@@ -96,11 +99,12 @@ if ($action === 'get_details') {
 }
 
 if ($action === 'attend_os') {
+    // Lógica ajustada para não depender de $_SESSION
     $os_tag = $_POST['os_tag'] ?? '';
-    $tecnico_codigo = $_POST['tecnico_codigo'] ?? ($_SESSION['usuario_codigo'] ?? 0);
+    $tecnico_codigo = $_POST['tecnico_codigo'] ?? 0;
 
     if (empty($os_tag) || empty($tecnico_codigo)) {
-        echo json_encode(["erro" => "Dados insuficientes para atender a OS."]);
+        echo json_encode(["erro" => "Dados insuficientes para atender a OS. Código do técnico é obrigatório."]);
         exit;
     }
     
@@ -125,7 +129,6 @@ if ($action === 'attend_os') {
     }
     exit;
 }
-
 
 echo json_encode(["erro" => "Ação inválida."]);
 ?>
