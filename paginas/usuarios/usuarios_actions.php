@@ -7,35 +7,46 @@ header('Content-Type: application/json');
 $action = $_POST['action'] ?? '';
 
 if ($action === 'get') {
-  $sql = "SELECT codigo, nome, ativo, cliente, tecnico, planejador, administrador FROM SGM_Usuarios";
+  $sql = "SELECT id, ativo_tag, descricao, modelo, numero_serie, setor_tag, tipo FROM SGM_Ativos";
   $stmt = sqlsrv_query($conn, $sql);
-  $usuarios = [];
-  if ($stmt) { while ($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) { $usuarios[] = $row; } }
-  echo json_encode($usuarios);
+  $ativos = [];
+  if ($stmt) { while ($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) { $ativos[] = $row; } }
+  echo json_encode($ativos);
 }
 elseif ($action === 'save') {
-    $codigo_original = $_POST['codigo_original'] ?? '';
-    $params = [$_POST['nome'] ?? '', $_POST['ativo'] ?? 0, $_POST['cliente'] ?? 0, $_POST['tecnico'] ?? 0, $_POST['planejador'] ?? 0, $_POST['admin'] ?? 0];
-    if (!empty($codigo_original)) {
-        $sql = "UPDATE SGM_Usuarios SET nome = ?, ativo = ?, cliente = ?, tecnico = ?, planejador = ?, administrador = ? WHERE codigo = ?";
-        $params[] = $codigo_original;
+    $idOriginal = $_POST['id_original'] ?? '';
+    $params = [$_POST['ativo_tag'] ?? '', $_POST['descricao'] ?? '', $_POST['modelo'] ?? '', $_POST['numero_serie'] ?? '', $_POST['setor_tag'] ?? '', $_POST['tipo'] ?? ''];
+    if (!empty($idOriginal)) {
+        $sql = "UPDATE SGM_Ativos SET ativo_tag = ?, descricao = ?, modelo = ?, numero_serie = ?, setor_tag = ?, tipo = ? WHERE id = ?";
+        $params[] = $idOriginal;
         $stmt = sqlsrv_query($conn, $sql, $params);
-        echo json_encode(["sucesso" => $stmt ? true : false, "mensagem" => $stmt ? "Utilizador atualizado com sucesso!" : "Erro ao atualizar utilizador."]);
+        if ($stmt) {
+            echo json_encode(["mensagem" => "Ativo atualizado com sucesso!"]);
+        } else {
+            echo json_encode(["erro" => "Erro ao atualizar ativo.", "details" => sqlsrv_errors()]);
+        }
     } else {
-        $sql = "INSERT INTO SGM_Usuarios (codigo, nome, ativo, cliente, tecnico, planejador, administrador) VALUES (?, ?, ?, ?, ?, ?, ?)";
-        array_unshift($params, $_POST['codigo'] ?? '');
+        $sql = "INSERT INTO SGM_Ativos (ativo_tag, descricao, modelo, numero_serie, setor_tag, tipo) VALUES (?, ?, ?, ?, ?, ?)";
         $stmt = sqlsrv_query($conn, $sql, $params);
-        echo json_encode(["sucesso" => $stmt ? true : false, "mensagem" => $stmt ? "Utilizador cadastrado com sucesso!" : "Erro ao cadastrar utilizador."]);
+        if ($stmt) {
+            echo json_encode(["mensagem" => "Ativo cadastrado com sucesso!"]);
+        } else {
+            echo json_encode(["erro" => "Erro ao cadastrar ativo.", "details" => sqlsrv_errors()]);
+        }
     }
 }
 elseif ($action === 'delete') {
-    $codigo = $_POST['codigo'] ?? '';
-    if (empty($codigo)) { echo json_encode(["erro" => "Código não informado"]); exit; }
-    $stmt = sqlsrv_query($conn, "DELETE FROM SGM_Usuarios WHERE codigo = ?", [$codigo]);
-    echo json_encode(["sucesso" => $stmt ? true : false, "mensagem" => $stmt ? "Utilizador apagado com sucesso!" : "Erro ao apagar utilizador."]);
+    $id = $_POST['id'] ?? '';
+    if (empty($id)) { echo json_encode(["erro" => "ID do ativo não informado"]); exit; }
+    $stmt = sqlsrv_query($conn, "DELETE FROM SGM_Ativos WHERE id = ?", [$id]);
+    if ($stmt) {
+        echo json_encode(["mensagem" => "Ativo apagado com sucesso!"]);
+    } else {
+        echo json_encode(["erro" => "Erro ao apagar ativo.", "details" => sqlsrv_errors()]);
+    }
 }
 else {
-    echo json_encode(["erro" => "Ação inválida"]);
+  echo json_encode(["erro" => "Ação inválida para ativos"]);
 }
 exit;
 ?>

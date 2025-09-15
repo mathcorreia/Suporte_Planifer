@@ -25,18 +25,30 @@ elseif ($action === 'save') {
         $sql = "UPDATE SGM_Tarefas SET tarefa_tag = ?, ativo_tag = ?, tarefa_descricao = ?, ultima_execucao = ? WHERE tarefa_codigo = ?";
         $params[] = $id;
         $stmt = sqlsrv_query($conn, $sql, $params);
-        echo json_encode(["mensagem" => $stmt ? "Tarefa atualizada com sucesso!" : "Erro ao atualizar tarefa."]);
+        if ($stmt) {
+            echo json_encode(["mensagem" => "Tarefa atualizada com sucesso!"]);
+        } else {
+            echo json_encode(["erro" => "Erro ao atualizar tarefa.", "details" => sqlsrv_errors()]);
+        }
     } else {
         $sql = "INSERT INTO SGM_Tarefas (tarefa_tag, ativo_tag, tarefa_descricao, ultima_execucao) VALUES (?, ?, ?, ?)";
         $stmt = sqlsrv_query($conn, $sql, $params);
-        echo json_encode(["mensagem" => $stmt ? "Tarefa cadastrada com sucesso!" : "Erro ao cadastrar tarefa."]);
+        if ($stmt) {
+            echo json_encode(["mensagem" => "Tarefa cadastrada com sucesso!"]);
+        } else {
+            echo json_encode(["erro" => "Erro ao cadastrar tarefa.", "details" => sqlsrv_errors()]);
+        }
     }
 }
 elseif ($action === 'delete') {
     $id = $_POST['id'] ?? '';
     if (empty($id)) { echo json_encode(["erro" => "ID da tarefa não informado"]); exit; }
     $stmt = sqlsrv_query($conn, "DELETE FROM SGM_Tarefas WHERE tarefa_codigo = ?", [$id]);
-    echo json_encode(["mensagem" => $stmt ? "Tarefa apagada com sucesso!" : "Erro ao apagar tarefa."]);
+    if ($stmt) {
+        echo json_encode(["mensagem" => "Tarefa apagada com sucesso!"]);
+    } else {
+        echo json_encode(["erro" => "Erro ao apagar tarefa.", "details" => sqlsrv_errors()]);
+    }
 }
 else {
     echo json_encode(["erro" => "Ação inválida para tarefas"]);

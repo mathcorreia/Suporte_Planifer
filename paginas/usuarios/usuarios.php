@@ -18,11 +18,11 @@
         <div class="col-md-3"><label class="form-label">Código (Chapa)</label><input type="number" name="codigo" class="form-control" required></div>
         <div class="col-md-9"><label class="form-label">Nome Completo</label><input type="text" name="nome" class="form-control" required></div>
         <div class="col-12"><label class="form-label">Perfis</label><br>
-          <div class="form-check form-check-inline"><input class="form-check-input" type="checkbox" name="ativo"> <label class="form-check-label">Ativo</label></div>
-          <div class="form-check form-check-inline"><input class="form-check-input" type="checkbox" name="cliente"> <label class="form-check-label">Cliente</label></div>
-          <div class="form-check form-check-inline"><input class="form-check-input" type="checkbox" name="tecnico"> <label class="form-check-label">Técnico</label></div>
-          <div class="form-check form-check-inline"><input class="form-check-input" type="checkbox" name="planejador"> <label class="form-check-label">Planejador</label></div>
-          <div class="form-check form-check-inline"><input class="form-check-input" type="checkbox" name="admin"> <label class="form-check-label">Administrador</label></div>
+          <div class="form-check form-check-inline"><input class="form-check-input" type="checkbox" name="ativo" value="1"> <label class="form-check-label">Ativo</label></div>
+          <div class="form-check form-check-inline"><input class="form-check-input" type="checkbox" name="cliente" value="1"> <label class="form-check-label">Cliente</label></div>
+          <div class="form-check form-check-inline"><input class="form-check-input" type="checkbox" name="tecnico" value="1"> <label class="form-check-label">Técnico</label></div>
+          <div class="form-check form-check-inline"><input class="form-check-input" type="checkbox" name="planejador" value="1"> <label class="form-check-label">Planejador</label></div>
+          <div class="form-check form-check-inline"><input class="form-check-input" type="checkbox" name="admin" value="1"> <label class="form-check-label">Administrador</label></div>
         </div>
         <div class="col-12"><button type="submit" class="btn btn-primary">Salvar</button><button type="button" class="btn btn-secondary" id="btnNovo">Novo</button></div>
       </form>
@@ -47,24 +47,36 @@ $(document).ready(function() {
       if(Array.isArray(data)) {
         data.forEach(u => {
           const perfis = [];
-          if (u.tecnico) perfis.push("Técnico");
-          if (u.planejador) perfis.push("Planejador");
-          if (u.administrador) perfis.push("Admin");
-          if (u.cliente) perfis.push("Cliente");
+          if (u.tecnico == 1) perfis.push("Técnico");
+          if (u.planejador == 1) perfis.push("Planejador");
+          if (u.administrador == 1) perfis.push("Admin");
+          if (u.cliente == 1) perfis.push("Cliente");
           const linha = tabela.row.add([u.codigo, u.nome, perfis.join(', '), `<button class="btn btn-sm btn-danger btn-apagar" data-codigo="${u.codigo}">🗑️</button>`]).draw().node();
           $(linha).data('usuario', u);
         });
       }
     }, 'json');
   }
+
   $('#formUsuario').submit(function(e) {
     e.preventDefault();
-    const payload = $(this).serialize() + '&' + $('input[type=checkbox]').map(function() { return this.name + '=' + (this.checked ? 1 : 0); }).get().join('&');
-    $.post('usuarios_actions.php', payload + '&action=save', function(res) {
-      alert(res.mensagem || res.erro || "Erro desconhecido");
-      if (res.sucesso) { carregarUsuarios(); limparFormulario(); }
+    const payload = $(this).serialize() + '&action=save';
+    $.post('usuarios_actions.php', payload, function(res) {
+        if (res.sucesso) {
+            alert(res.mensagem);
+            carregarUsuarios();
+            limparFormulario();
+        } else {
+            let errorMsg = res.mensagem || res.erro || "Erro desconhecido";
+            if (res.details) {
+                // Formata o erro do SQL Server para ser mais legível
+                errorMsg += "\\nDetalhes: " + JSON.stringify(res.details[0].message);
+            }
+            alert(errorMsg);
+        }
     }, 'json');
   });
+
   $('#usuariosTable tbody').on('click', 'tr', function () {
     $('#usuariosTable tbody tr').removeClass('selected');
     $(this).addClass('selected');
@@ -80,17 +92,20 @@ $(document).ready(function() {
       $('input[name="admin"]').prop('checked', usuario.administrador == 1);
     }
   });
+
   $('#usuariosTable tbody').on('click', '.btn-apagar', function (e) {
     e.stopPropagation();
     const codigo = $(this).data('codigo');
     if (confirm(`Deseja realmente apagar o utilizador de código ${codigo}?`)) {
       $.post('usuarios_actions.php', { action: 'delete', codigo: codigo }, function (res) {
-        alert(res.mensagem || res.erro || "Erro ao apagar.");
+        alert(res.mensagem || res.erro);
         if(res.sucesso) carregarUsuarios();
       }, 'json');
     }
   });
+
   $('#btnNovo').on('click', limparFormulario);
+
   function limparFormulario() {
     $('#formUsuario')[0].reset();
     $('input[name="codigo_original"]').val('');
