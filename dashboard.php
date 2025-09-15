@@ -36,7 +36,7 @@
 <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
 <script>
 $(document).ready(function() {
-    $.post('dashboard_actions.php', { action: 'get_stats' }, function(data) {
+    $.post('dashboard_actions.php', function(data) {
         if (!data.erro) {
             $('#totalAtivos').text(data.total_ativos);
             $('#maquinasParadas').text(data.maquinas_paradas);

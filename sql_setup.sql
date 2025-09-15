@@ -1,22 +1,29 @@
--- Garante que a tabela SGM_TAGStatus exista antes de inserir dados
-IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[SGM_TAGStatus]') AND type in (N'U'))
+-- Cria o Schema (a "pasta") se ele ainda não existir
+IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = 'SISTEMAS_SUPORTE')
 BEGIN
-CREATE TABLE SGM_TAGStatus (
+    EXEC('CREATE SCHEMA SISTEMAS_SUPORTE');
+END
+GO
+
+-- Tabela de Status para as Ordens de Serviço
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[SISTEMAS_SUPORTE].[SGM_TAGStatus]') AND type in (N'U'))
+BEGIN
+CREATE TABLE [SISTEMAS_SUPORTE].SGM_TAGStatus (
     TAGStatusID INT IDENTITY(1,1) PRIMARY KEY,
     TAGStatus NVARCHAR(50) NOT NULL
 );
--- Popula a tabela de Status apenas se ela foi recém-criada
-INSERT INTO SGM_TAGStatus (TAGStatus) VALUES
+-- Popula a tabela de Status
+INSERT INTO [SISTEMAS_SUPORTE].SGM_TAGStatus (TAGStatus) VALUES
 ('Aguardando Análise'), ('Aguardando Técnico'), ('Aguardando Terceiros'),
 ('Aguardando Peça'), ('Aguardando Liberação'), ('Aguardando Aprovação'),
 ('Em Atendimento'), ('Consolidando'), ('Em Testes'), ('Concluída');
 END
 GO
 
--- Garante que a tabela SGM_Usuarios exista (sem senha)
-IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[SGM_Usuarios]') AND type in (N'U'))
+-- Tabela de Usuários
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[SISTEMAS_SUPORTE].[SGM_Usuarios]') AND type in (N'U'))
 BEGIN
-CREATE TABLE SGM_Usuarios (
+CREATE TABLE [SISTEMAS_SUPORTE].SGM_Usuarios (
     codigo INT PRIMARY KEY,
     nome NVARCHAR(255) NOT NULL,
     ativo BIT DEFAULT 1,
@@ -28,40 +35,26 @@ CREATE TABLE SGM_Usuarios (
 END
 GO
 
--- Remove a coluna 'senha' da tabela SGM_Usuarios se ela existir
-IF EXISTS (SELECT * FROM sys.columns WHERE Name = N'senha' AND Object_ID = Object_ID(N'SGM_Usuarios'))
+-- Tabela de Ativos
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[SISTEMAS_SUPORTE].[SGM_Ativos]') AND type in (N'U'))
 BEGIN
-    ALTER TABLE SGM_Usuarios DROP COLUMN senha;
-END
-GO
-
--- Garante que a tabela SGM_Ativos exista
-IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[SGM_Ativos]') AND type in (N'U'))
-BEGIN
-CREATE TABLE SGM_Ativos (
+CREATE TABLE [SISTEMAS_SUPORTE].SGM_Ativos (
     id INT IDENTITY(1,1) PRIMARY KEY,
     ativo_tag NVARCHAR(50) UNIQUE NOT NULL,
     descricao NVARCHAR(MAX),
     setor_tag NVARCHAR(50),
     modelo NVARCHAR(100),
     numero_serie NVARCHAR(100),
-    tipo NVARCHAR(50)
+    tipo NVARCHAR(50),
+    instalacao DATE
 );
 END
 GO
 
--- Adiciona a coluna 'instalacao' à tabela SGM_Ativos se ela não existir
-IF NOT EXISTS (SELECT * FROM sys.columns WHERE Name = N'instalacao' AND Object_ID = Object_ID(N'SGM_Ativos'))
+-- Tabela de Tarefas
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[SISTEMAS_SUPORTE].[SGM_Tarefas]') AND type in (N'U'))
 BEGIN
-    ALTER TABLE SGM_Ativos ADD instalacao DATE;
-END
-GO
-
--- As tabelas restantes são criadas apenas se não existirem
-
-IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[SGM_Tarefas]') AND type in (N'U'))
-BEGIN
-CREATE TABLE SGM_Tarefas (
+CREATE TABLE [SISTEMAS_SUPORTE].SGM_Tarefas (
     tarefa_codigo INT IDENTITY(1,1) PRIMARY KEY,
     tarefa_tag NVARCHAR(100) NOT NULL,
     ativo_tag NVARCHAR(50),
@@ -71,9 +64,10 @@ CREATE TABLE SGM_Tarefas (
 END
 GO
 
-IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[SGM_OS]') AND type in (N'U'))
+-- Tabela de Ordens de Serviço (OS)
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[SISTEMAS_SUPORTE].[SGM_OS]') AND type in (N'U'))
 BEGIN
-CREATE TABLE SGM_OS (
+CREATE TABLE [SISTEMAS_SUPORTE].SGM_OS (
     os_tag NVARCHAR(50) PRIMARY KEY,
     ativo_tag NVARCHAR(50),
     maquina_parada BIT,
@@ -86,9 +80,10 @@ CREATE TABLE SGM_OS (
 END
 GO
 
-IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[SGM_OS_Status]') AND type in (N'U'))
+-- Tabela de Histórico de Status da OS
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[SISTEMAS_SUPORTE].[SGM_OS_Status]') AND type in (N'U'))
 BEGIN
-CREATE TABLE SGM_OS_Status (
+CREATE TABLE [SISTEMAS_SUPORTE].SGM_OS_Status (
     codigo_os_status INT IDENTITY(1,1) PRIMARY KEY,
     os_tag NVARCHAR(50),
     tag_status_id INT,
@@ -101,9 +96,10 @@ CREATE TABLE SGM_OS_Status (
 END
 GO
 
-IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[SGM_OS_Pecas]') AND type in (N'U'))
+-- Tabela de Peças da OS
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[SISTEMAS_SUPORTE].[SGM_OS_Pecas]') AND type in (N'U'))
 BEGIN
-CREATE TABLE SGM_OS_Pecas (
+CREATE TABLE [SISTEMAS_SUPORTE].SGM_OS_Pecas (
     cod_os_pecas INT IDENTITY(1,1) PRIMARY KEY,
     os_tag VARCHAR(50),
     codigo VARCHAR(50),

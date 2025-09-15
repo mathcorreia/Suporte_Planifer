@@ -2,8 +2,7 @@
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
-// Caminho corrigido
-require_once __DIR__ . '/../../../database/config.php';
+require_once __DIR__ . '/../../config.php';
 
 header('Content-Type: application/json');
 
@@ -15,7 +14,7 @@ if (!$conn) {
 $action = $_POST['action'] ?? '';
 
 if ($action === 'get') {
-  $sql = "SELECT id, ativo_tag, descricao, modelo, numero_serie, setor_tag, tipo FROM SGM_Ativos";
+  $sql = "SELECT id, ativo_tag, descricao, modelo, numero_serie, setor_tag, tipo FROM SISTEMAS_SUPORTE.SGM_Ativos";
   $stmt = sqlsrv_query($conn, $sql);
   $ativos = [];
   if ($stmt) {
@@ -41,12 +40,12 @@ if ($action === 'save') {
     ];
 
     if (!empty($idOriginal)) {
-        $sql = "UPDATE SGM_Ativos SET ativo_tag = ?, descricao = ?, modelo = ?, numero_serie = ?, setor_tag = ?, tipo = ? WHERE id = ?";
+        $sql = "UPDATE SISTEMAS_SUPORTE.SGM_Ativos SET ativo_tag = ?, descricao = ?, modelo = ?, numero_serie = ?, setor_tag = ?, tipo = ? WHERE id = ?";
         $params[] = $idOriginal;
         $stmt = sqlsrv_query($conn, $sql, $params);
         echo json_encode(["mensagem" => $stmt ? "Ativo atualizado com sucesso!" : "Erro ao atualizar ativo."]);
     } else {
-        $sql = "INSERT INTO SGM_Ativos (ativo_tag, descricao, modelo, numero_serie, setor_tag, tipo) VALUES (?, ?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO SISTEMAS_SUPORTE.SGM_Ativos (ativo_tag, descricao, modelo, numero_serie, setor_tag, tipo) VALUES (?, ?, ?, ?, ?, ?)";
         $stmt = sqlsrv_query($conn, $sql, $params);
         echo json_encode(["mensagem" => $stmt ? "Ativo cadastrado com sucesso!" : "Erro ao cadastrar ativo."]);
     }
@@ -59,7 +58,7 @@ if ($action === 'delete') {
       echo json_encode(["erro" => "ID do ativo não informado"]);
       exit;
     }
-    $stmt = sqlsrv_query($conn, "DELETE FROM SGM_Ativos WHERE id = ?", [$id]);
+    $stmt = sqlsrv_query($conn, "DELETE FROM SISTEMAS_SUPORTE.SGM_Ativos WHERE id = ?", [$id]);
     echo json_encode(["mensagem" => $stmt ? "Ativo apagado com sucesso!" : "Erro ao apagar ativo."]);
     exit;
 }

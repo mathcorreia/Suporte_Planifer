@@ -36,25 +36,6 @@
   </div>
 </div>
 
-<div class="modal fade" id="modalDetalhesOSS" tabindex="-1">
-    <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="detalhes_os_tag"></h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <h6>Informações Gerais</h6>
-                <p id="detalhes_info"></p>
-                <hr>
-                <h6>Histórico de Status</h6>
-                <div id="detalhes_status_historico"></div>
-            </div>
-            <div class="modal-footer" id="detalhes_footer"></div>
-        </div>
-    </div>
-</div>
-
 <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
@@ -65,6 +46,7 @@ $(document).ready(function() {
           container.empty();
           if (Array.isArray(res) && res.length > 0) {
               res.forEach(oss => {
+                  const dataCriacao = oss.data_criacao ? new Date(oss.data_criacao.date).toLocaleString('pt-BR') : 'Data indisponível';
                   const cardClass = oss.maquina_parada == 1 ? 'parado' : '';
                   const cardHtml = `
                       <div class="col-md-6 col-lg-4">
@@ -73,8 +55,8 @@ $(document).ready(function() {
                                   <h5 class="card-title">${oss.ativo_tag} <span class="badge bg-info float-end">${oss.status_atual}</span></h5>
                                   <h6 class="card-subtitle mb-2 text-muted">OS: ${oss.os_tag}</h6>
                                   <p class="card-text">${(oss.descricao_problema || '').substring(0, 100)}...</p>
-                                  <p class="card-text"><small class="text-muted">Aberto em: ${new Date(oss.data_criacao.date).toLocaleString('pt-BR')}</small></p>
-                                  <a href="#" class="card-link btn-mostrar-mais" data-ostag="${oss.os_tag}">Mostrar mais...</a>
+                                  <p class="card-text"><small class="text-muted">Aberto em: ${dataCriacao}</small></p>
+                                  <a href="#" class="card-link">Mostrar mais...</a>
                               </div>
                           </div>
                       </div>`;
@@ -97,52 +79,6 @@ $(document).ready(function() {
               carregarOSS();
           }
       }, 'json');
-  });
-
-  $('#lista-oss').on('click', '.btn-mostrar-mais', function(e) {
-    e.preventDefault();
-    const os_tag = $(this).data('ostag');
-    $.post('ordem_servico_actions.php', {action: 'get_details', os_tag: os_tag}, function(res) {
-        if(res.os) {
-            $('#detalhes_os_tag').text('Detalhes da OS: ' + res.os.os_tag);
-            let info = `<strong>Ativo:</strong> ${res.os.ativo_tag}<br>
-                        <strong>Problema:</strong> ${res.os.descricao_problema}<br>
-                        <strong>Solicitante:</strong> ${res.os.solicitante_nome} (${res.os.solicitante})<br>
-                        <strong>Abertura:</strong> ${new Date(res.os.data_criacao.date).toLocaleString('pt-BR')}`;
-            $('#detalhes_info').html(info);
-
-            let historicoHtml = '<ul class="list-group">';
-            res.historico.forEach(h => {
-                historicoHtml += `<li class="list-group-item">
-                    <strong>${h.TAGStatus}</strong> - Início: ${new Date(h.data_inicio.date).toLocaleString('pt-BR')}
-                    <br><small>${h.descricao}</small></li>`;
-            });
-            historicoHtml += '</ul>';
-            $('#detalhes_status_historico').html(historicoHtml);
-
-            let footerHtml = '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>';
-            if(res.pode_atender) {
-                footerHtml += `<button type="button" class="btn btn-success btn-atender" data-ostag="${os_tag}">Atender</button>`;
-            }
-            $('#detalhes_footer').html(footerHtml);
-
-            $('#modalDetalhesOSS').modal('show');
-        }
-    }, 'json');
-  });
-
-  $('#modalDetalhesOSS').on('click', '.btn-atender', function() {
-      const os_tag = $(this).data('ostag');
-      const tecnico_codigo = prompt("Informe seu código de técnico para iniciar o atendimento:");
-      if (tecnico_codigo) {
-          $.post('ordem_servico_actions.php', {action: 'attend_os', os_tag: os_tag, tecnico_codigo: tecnico_codigo}, function(res) {
-              alert(res.mensagem || res.erro);
-              if (res.sucesso) {
-                  $('#modalDetalhesOSS').modal('hide');
-                  carregarOSS();
-              }
-          }, 'json');
-      }
   });
 
   carregarOSS();

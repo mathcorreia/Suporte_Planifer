@@ -1,49 +1,31 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-  <meta charset="UTF-8">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body class="bg-light">
-<div class="container py-4">
-    <div class="row">
-        <div class="col-lg-4 mb-4">
-            <div class="card text-white bg-primary">
-                <div class="card-body">
-                    <h5 class="card-title">Ativos Totais</h5>
-                    <p class="card-text fs-3" id="totalAtivos">--</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-4 mb-4">
-            <div class="card text-white bg-danger">
-                <div class="card-body">
-                    <h5 class="card-title">Máquinas Paradas</h5>
-                    <p class="card-text fs-3" id="maquinasParadas">--</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-4 mb-4">
-            <div class="card text-white bg-warning">
-                <div class="card-body">
-                    <h5 class="card-title">OS em Aberto</h5>
-                    <p class="card-text fs-3" id="osAbertas">--</p>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-<script src="https://code.jquery.com/jquery-3.7.0.js"></script>
-<script>
-$(document).ready(function() {
-    $.post('dashboard_actions.php', { action: 'get_stats' }, function(data) {
-        if (!data.erro) {
-            $('#totalAtivos').text(data.total_ativos);
-            $('#maquinasParadas').text(data.maquinas_paradas);
-            $('#osAbertas').text(data.os_abertas);
-        }
-    }, 'json');
-});
-</script>
-</body>
-</html>
+<?php
+require_once __DIR__ . '/config.php';
+header('Content-Type: application/json');
+
+if (!$conn) {
+  echo json_encode(["erro" => "Falha na conexão com a base de dados."]);
+  exit;
+}
+
+$stats = [];
+
+// Total de Ativos
+$sql_ativos = "SELECT COUNT(id) as total FROM SISTEMAS_SUPORTE.SGM_Ativos";
+$stmt_ativos = sqlsrv_query($conn, $sql_ativos);
+$stats['total_ativos'] = ($stmt_ativos) ? sqlsrv_fetch_array($stmt_ativos, SQLSRV_FETCH_ASSOC)['total'] : 0;
+
+// OS Abertas e Máquinas Paradas
+$sql_os = "SELECT COUNT(os_tag) as total_os, SUM(CAST(maquina_parada AS INT)) as total_paradas FROM SISTEMAS_SUPORTE.SGM_OS WHERE data_conclusao IS NULL";
+$stmt_os = sqlsrv_query($conn, $sql_os);
+if($stmt_os) {
+    $res_os = sqlsrv_fetch_array($stmt_os, SQLSRV_FETCH_ASSOC);
+    $stats['os_abertas'] = $res_os['total_os'] ?? 0;
+    $stats['maquinas_paradas'] = $res_os['total_paradas'] ?? 0;
+} else {
+    $stats['os_abertas'] = 0;
+    $stats['maquinas_paradas'] = 0;
+}
+
+echo json_encode($stats);
+exit;
+?>

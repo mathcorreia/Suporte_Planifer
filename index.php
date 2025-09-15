@@ -1,8 +1,3 @@
-<?php
-// Inclui o ficheiro de autenticação no início de tudo.
-// Ele irá tratar da verificação do utilizador e das permissões.
-require_once __DIR__ . '/auth_ad.php';
-?>
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -11,7 +6,6 @@ require_once __DIR__ . '/auth_ad.php';
   <title>Sistema de Gestão</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
-    /* ... (o seu CSS aqui) ... */
     body { background-color: #f8f9fa; }
     .sidebar { height: 100vh; position: fixed; top: 0; left: 0; width: 240px; background-color: #343a40; color: white; padding-top: 1rem; }
     .sidebar-header { text-align: center; margin-bottom: 1rem; }
@@ -26,22 +20,15 @@ require_once __DIR__ . '/auth_ad.php';
 <div class="sidebar">
   <div class="sidebar-header">
     <h4>Menu Principal</h4>
-    <small>Bem-vindo, <?php echo htmlspecialchars($_SESSION['usuario']['nome_completo']); ?>!</small>
   </div>
   <a onclick="carregarModulo('Dashboard')" id="menuDashboard">Dashboard</a>
   <a onclick="carregarModulo('OS')" id="menuOS">Ordens de Serviço</a>
   <a onclick="carregarModulo('Relatorios')" id="menuRelatorios">Relatórios</a>
-
-  <?php if (has_permission('administrador') || has_permission('planejador')): ?>
   <hr style="border-color: #6c757d;">
   <small style="padding: 10px 20px; color: #6c757d; text-transform: uppercase;">Cadastros</small>
   <a onclick="carregarModulo('Ativos')" id="menuAtivos">Ativos</a>
-    <?php if (has_permission('administrador')): // Apenas administradores podem ver utilizadores ?>
-    <a onclick="carregarModulo('Usuarios')" id="menuUsuarios">Usuários</a>
-    <?php endif; ?>
+  <a onclick="carregarModulo('Usuarios')" id="menuUsuarios">Usuários</a>
   <a onclick="carregarModulo('Tarefas')" id="menuTarefas">Tarefas</a>
-  <?php endif; ?>
-
 </div>
 
 <div class="main-content">
@@ -50,7 +37,6 @@ require_once __DIR__ . '/auth_ad.php';
 </div>
 
 <script>
-// ... (O seu JavaScript aqui, não precisa de alterações) ...
 function carregarModulo(modulo) {
   const modulosInfo = {
     Dashboard: { titulo: "Dashboard Principal", path: "dashboard.php" },
