@@ -2,6 +2,7 @@
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
+// Caminho corrigido para a raiz
 require_once __DIR__ . '/config.php';
 header('Content-Type: application/json');
 

@@ -1,7 +1,8 @@
 <?php
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
-require_once __DIR__ . '/../../config.php';
+// Caminho corrigido para subir três níveis até à raiz
+require_once __DIR__ . '/../../../config.php';
 header('Content-Type: application/json');
 
 $action = $_POST['action'] ?? '';
@@ -21,7 +22,6 @@ elseif ($action === 'save') {
     $codigo_original = $_POST['codigo_original'] ?? '';
     $codigo = $_POST['codigo'] ?? '';
     
-    // Tratamento robusto dos dados do formulário
     $params = [
         'nome' => $_POST['nome'] ?? '',
         'ativo' => isset($_POST['ativo']) ? 1 : 0,
@@ -32,7 +32,6 @@ elseif ($action === 'save') {
     ];
 
     if (!empty($codigo_original)) {
-        // MODO DE ATUALIZAÇÃO
         $sql = "UPDATE SGM_Usuarios SET nome = ?, ativo = ?, cliente = ?, tecnico = ?, planejador = ?, administrador = ? WHERE codigo = ?";
         $query_params = array_values($params);
         $query_params[] = $codigo_original;
@@ -45,7 +44,6 @@ elseif ($action === 'save') {
             echo json_encode(["sucesso" => false, "mensagem" => "Erro ao atualizar utilizador.", "details" => sqlsrv_errors()]);
         }
     } else {
-        // MODO DE CRIAÇÃO
         $sql = "INSERT INTO SGM_Usuarios (codigo, nome, ativo, cliente, tecnico, planejador, administrador) VALUES (?, ?, ?, ?, ?, ?, ?)";
         $query_params = array_merge([$codigo], array_values($params));
 

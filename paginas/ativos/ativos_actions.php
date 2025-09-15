@@ -1,7 +1,8 @@
 <?php
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
-require_once __DIR__ . '/../../config.php';
+// Caminho corrigido para subir três níveis até à raiz
+require_once __DIR__ . '/../../../config.php';
 header('Content-Type: application/json');
 
 $action = $_POST['action'] ?? '';
