@@ -41,6 +41,8 @@ $(document).ready(function() {
             $('#totalAtivos').text(data.total_ativos);
             $('#maquinasParadas').text(data.maquinas_paradas);
             $('#osAbertas').text(data.os_abertas);
+        } else {
+            $('body').prepend(`<div class="alert alert-danger">${data.erro}</div>`);
         }
     }, 'json');
 });
