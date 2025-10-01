@@ -61,7 +61,6 @@ elseif ($action === 'get_details') {
     $details = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
 
     if ($details) {
-        // Formata as datas para o formato esperado pelo input datetime-local
         foreach($details as $key => &$value) {
             if ($value instanceof DateTime) {
                 $value = $value->format('Y-m-d\TH:i');
@@ -69,7 +68,6 @@ elseif ($action === 'get_details') {
         }
     }
 
-    // Adiciona a lista de status disponíveis para o dropdown de edição
     $sql_status = "SELECT TAGStatus FROM SGM_TAGStatus";
     $stmt_status = sqlsrv_query($conn, $sql_status);
     $status_list = [];
@@ -89,13 +87,13 @@ elseif ($action === 'update') {
         exit;
     }
 
+    // CORRIGIDO: Removida a 'Data_Solicitacao' para que não seja alterada
     $params = [
         'Ativo_TAG' => $_POST['Ativo_TAG'] ?? null,
         'Solicitante' => $_POST['Solicitante'] ?? null,
         'Status' => $_POST['Status'] ?? null,
         'Descricao_Servico' => $_POST['Descricao_Servico'] ?? null,
         'Maquina_Parada' => isset($_POST['Maquina_Parada']) ? 1 : 0,
-        'Data_Solicitacao' => empty($_POST['Data_Solicitacao']) ? null : str_replace('T', ' ', $_POST['Data_Solicitacao']),
         'Data_Inicio_Atendimento' => empty($_POST['Data_Inicio_Atendimento']) ? null : str_replace('T', ' ', $_POST['Data_Inicio_Atendimento']),
         'Data_Fim_Atendimento' => empty($_POST['Data_Fim_Atendimento']) ? null : str_replace('T', ' ', $_POST['Data_Fim_Atendimento']),
     ];

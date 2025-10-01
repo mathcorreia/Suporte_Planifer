@@ -5,18 +5,33 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    .card-metric {
-        border-left-width: 4px;
-        border-radius: .35rem;
-    }
+    .card-metric { border-left-width: 4px; border-radius: .35rem; }
     .border-left-primary { border-left-color: #4e73df !important; }
     .border-left-success { border-left-color: #1cc88a !important; }
     .border-left-warning { border-left-color: #f6c23e !important; }
     .border-left-danger  { border-left-color: #e74a3b !important; }
+
+    /* NOVO: Estilos para o alerta piscando */
+    .blinking-alert {
+        display: none; /* Começa escondido */
+        animation: blinker 1.5s linear infinite;
+        font-weight: bold;
+        text-align: center;
+    }
+    @keyframes blinker {
+        50% {
+            opacity: 0.3;
+        }
+    }
   </style>
 </head>
 <body class="bg-light">
 <div class="container-fluid py-4">
+    
+    <div id="maquinaParadaAlert" class="alert alert-danger blinking-alert" role="alert">
+      AVISO: Existem máquinas paradas!
+    </div>
+
     <div class="row">
         <div class="col-xl-3 col-md-6 mb-4">
             <div class="card card-metric border-left-primary shadow h-100 py-2">
@@ -77,49 +92,48 @@
 <script>
 $(document).ready(function() {
     $.post('dashboard_actions.php', function(data) {
-        // --- INÍCIO DA DEPURAÇÃO ---
-        console.log("Dados recebidos do servidor:", data);
-        // --- FIM DA DEPURAÇÃO ---
+        if (!data || data.erro) {
+            $('body').prepend(`<div class="alert alert-danger">${data ? data.erro : 'Erro desconhecido.'}</div>`);
+            return;
+        }
 
-        if (data && data.stats) {
-            // Preenche as métricas principais
+        if (data.stats) {
             $('#totalAtivos').text(data.stats.total_ativos || 0);
             $('#totalSetores').text(data.stats.total_setores || 0);
             $('#osAbertas').text(data.stats.os_abertas || 0);
             $('#maquinasParadas').text(data.stats.maquinas_paradas || 0);
-        } else {
-             console.error("Objeto 'stats' não encontrado na resposta.");
+
+            // ATUALIZADO: Lógica para mostrar o alerta piscando
+            if (parseInt(data.stats.maquinas_paradas) > 0) {
+                const plural = data.stats.maquinas_paradas > 1 ? 's' : '';
+                $('#maquinaParadaAlert').text(`AVISO: Existem ${data.stats.maquinas_paradas} máquina${plural} parada${plural}!`).show();
+            }
         }
 
-        // Cria o gráfico de status
-        if (data && data.os_status_breakdown && data.os_status_breakdown.length > 0) {
+        if (data.os_status_breakdown && data.os_status_breakdown.length > 0) {
             const ctx = document.getElementById('statusChart').getContext('2d');
-            const labels = data.os_status_breakdown.map(item => item.Status);
+            const labels = data.os_status_breakdown.map(item => item.TAGStatus);
             const values = data.os_status_breakdown.map(item => item.total);
             new Chart(ctx, {
                 type: 'doughnut',
                 data: { labels: labels, datasets: [{ data: values, backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b', '#858796'] }] },
                 options: { responsive: true, maintainAspectRatio: false }
             });
-        } else {
-            console.log("Não há dados para o gráfico de status.");
         }
         
-        // Preenche a tabela de OS recentes
         const tableBody = $('#recentOsTable');
         tableBody.empty();
-        if (data && data.recent_os && data.recent_os.length > 0) {
+        if (data.recent_os && data.recent_os.length > 0) {
             data.recent_os.forEach(os => {
-                const row = `<tr><td>${os.OS_ID}</td><td>${os.Ativo_TAG}</td><td>${(os.Descricao_Servico || '').substring(0, 40)}...</td><td>${os.Data_Solicitacao}</td></tr>`;
+                const row = `<tr><td>${os.os_tag}</td><td>${os.ativo_tag}</td><td>${(os.descricao_problema || '').substring(0, 40)}...</td><td>${os.data_criacao}</td></tr>`;
                 tableBody.append(row);
             });
         } else {
             tableBody.append('<tr><td colspan="4" class="text-center">Nenhuma OS recente encontrada.</td></tr>');
         }
 
-    }).fail(function(jqXHR, textStatus, errorThrown) {
-        console.error("Falha na requisição AJAX:", textStatus, errorThrown);
-        $('body').prepend(`<div class="alert alert-danger">Falha grave na comunicação com o servidor. Verifique o console do navegador para mais detalhes.</div>`);
+    }, 'json').fail(function() {
+        $('body').prepend(`<div class="alert alert-danger">Falha na requisição ao dashboard.</div>`);
     });
 });
 </script>

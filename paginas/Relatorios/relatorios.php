@@ -26,6 +26,7 @@
             </optgroup>
             <optgroup label="Movimentações">
                  <option value="os_completo">Histórico Completo de OS</option>
+                 <option value="os_audit">Auditoria de Alterações de Status (OS)</option>
             </optgroup>
           </select>
         </div>
@@ -48,9 +49,10 @@
 <script type="text/javascript" src="https://cdn.datatables.net/v/bs5/dt-1.13.6/b-2.4.2/b-html5-2.4.2/b-print-2.4.2/datatables.min.js"></script>
 <script>
 $(document).ready(function() {
-    // Mostra/esconde o filtro de data dependendo do relatório selecionado
+    // ATUALIZADO: Mostra o filtro de data para ambos os relatórios de OS
     $('#tipo_relatorio').on('change', function() {
-        $('#opcoes_os_historico').toggle($(this).val() === 'os_completo');
+        const showDateFilter = $(this).val() === 'os_completo' || $(this).val() === 'os_audit';
+        $('#opcoes_os_historico').toggle(showDateFilter);
     });
     let dataTable;
     $('#formRelatorio').on('submit', function(e) {
@@ -73,12 +75,7 @@ $(document).ready(function() {
                 dataTable = $('#tabelaRelatorio').DataTable({
                     data: res.dados.map(item => Object.values(item)),
                     dom: 'Bfrtip', 
-                    buttons: [
-                        'csv', 
-                        { extend: 'excel', text: 'Salvar em XLSX' },
-                        'pdf', 
-                        'print'
-                    ]
+                    buttons: [ 'csv', { extend: 'excel', text: 'Salvar em XLSX' }, 'pdf', 'print' ]
                 });
             } else {
                 $('#resultadoRelatorio').html('<div class="alert alert-warning">Nenhum dado encontrado.</div>');

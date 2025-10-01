@@ -112,6 +112,8 @@ $(document).ready(function() {
               });
           }
 
+          const dataSolicitacaoFormatada = details.Data_Solicitacao ? new Date(details.Data_Solicitacao.replace('T', ' ')).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short'}) : 'N/A';
+
           const formHtml = `
             <input type="hidden" name="OS_ID" value="${details.OS_ID}">
             <div class="row g-3">
@@ -119,8 +121,7 @@ $(document).ready(function() {
                 <div class="col-md-4"><label class="form-label">Solicitante</label><input type="number" class="form-control" name="Solicitante" value="${details.Solicitante || ''}"></div>
                 <div class="col-md-4"><label class="form-label">Status</label><select class="form-select" name="Status">${statusOptions}</select></div>
 
-                <div class="col-md-4"><label class="form-label">Data Solicitação</label><input type="datetime-local" class="form-control" name="Data_Solicitacao" value="${details.Data_Solicitacao || ''}"></div>
-                <div class="col-md-4"><label class="form-label">Início Atendimento</label><input type="datetime-local" class="form-control" name="Data_Inicio_Atendimento" value="${details.Data_Inicio_Atendimento || ''}"></div>
+                <div class="col-md-4"><label class="form-label">Data Solicitação (Fixo)</label><input type="text" class="form-control" value="${dataSolicitacaoFormatada}" readonly></div>
                 <div class="col-md-4"><label class="form-label">Fim Atendimento</label><input type="datetime-local" class="form-control" name="Data_Fim_Atendimento" value="${details.Data_Fim_Atendimento || ''}"></div>
                 
                 <div class="col-md-12"><label class="form-label">Descrição do Serviço</label><textarea class="form-control" name="Descricao_Servico" rows="3">${details.Descricao_Servico || ''}</textarea></div>

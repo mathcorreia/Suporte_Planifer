@@ -14,13 +14,11 @@ if ($action === 'generate') {
 
     switch ($report_type) {
         case 'ativos_completo':
-            // Traz TODAS as colunas da tabela de ativos
             $sql = "SELECT * FROM SGM_Ativos ORDER BY Ativo_TAG";
             $stmt = sqlsrv_query($conn, $sql);
             break;
 
         case 'os_completo':
-            // Traz TODAS as colunas da tabela de OS, com filtro de data
             $sql = "SELECT * FROM SGM_OS WHERE 1=1";
             if (!empty($_POST['os_data_inicio'])) { 
                 $sql .= " AND Data_Solicitacao >= ?"; 
@@ -35,21 +33,36 @@ if ($action === 'generate') {
             break;
 
         case 'usuarios':
-            // Traz todas as informações de usuários
             $sql = "SELECT * FROM SGM_Usuarios ORDER BY nome";
             $stmt = sqlsrv_query($conn, $sql);
             break;
 
         case 'tarefas':
-            // Traz todas as informações de tarefas
             $sql = "SELECT * FROM SGM_Tarefas ORDER BY tarefa_tag";
             $stmt = sqlsrv_query($conn, $sql);
             break;
 
         case 'setores':
-            // Traz todas as informações de setores
             $sql = "SELECT * FROM SGM_Setores ORDER BY Setor_TAG";
             $stmt = sqlsrv_query($conn, $sql);
+            break;
+            
+        // NOVO BLOCO ADICIONADO PARA O RELATÓRIO DE AUDITORIA
+        case 'os_audit':
+            $sql = "SELECT h.os_tag, s.TAGStatus, h.data_inicio, h.abriu_codigo, h.data_fim, h.fechou_codigo, h.descricao
+                    FROM SGM_OS_Status h
+                    LEFT JOIN SGM_TAGStatus s ON h.tag_status_id = s.TAGStatusID
+                    WHERE 1=1";
+            if (!empty($_POST['os_data_inicio'])) { 
+                $sql .= " AND h.data_inicio >= ?"; 
+                $params[] = $_POST['os_data_inicio']; 
+            }
+            if (!empty($_POST['os_data_fim'])) { 
+                $sql .= " AND h.data_inicio <= ?"; 
+                $params[] = $_POST['os_data_fim'] . ' 23:59:59'; 
+            }
+            $sql .= " ORDER BY h.os_tag, h.data_inicio ASC";
+            $stmt = sqlsrv_query($conn, $sql, $params);
             break;
 
         default:
@@ -60,7 +73,6 @@ if ($action === 'generate') {
     if ($stmt) {
         $data = [];
         while ($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
-            // Formata todas as datas para um formato legível
             foreach($row as &$value) { 
                 if ($value instanceof DateTime) { 
                     $value = $value->format('d/m/Y H:i:s'); 
