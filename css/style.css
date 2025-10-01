@@ -2,7 +2,7 @@
 
 @font-face {
     font-family: 'StaraBlack';
-    src: url('../../img/Stara-Black.woff') format('woff'); 
+    src: url('../img/Stara-Black.woff') format('woff'); 
     font-weight: normal;
     font-style: normal;
 }
@@ -18,8 +18,6 @@ body {
     flex-direction: column;
     min-height: 100vh;
 }
-
-/* ... o resto do seu código CSS permanece exatamente o mesmo ... */
 
 .img-fundo {
     position: fixed;
@@ -69,15 +67,16 @@ h2 {
     justify-content: center;
 }
 
-nav {
+nav#main-nav {
     display: flex;
     justify-content: center;
+    flex-wrap: wrap;
     background: #1a2f5a;
     padding: 0.8rem;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-nav a {
+nav#main-nav a {
     color: #fff;
     padding: 0.5rem 1.5rem;
     text-decoration: none;
@@ -86,8 +85,8 @@ nav a {
     border-radius: 5px;
 }
 
-nav a:hover,
-nav a.active {
+nav#main-nav a:hover,
+nav#main-nav a.active {
     background-color: #2A4687;
 }
 
@@ -199,10 +198,16 @@ label {
     color: #555;
 }
 
+label input[type="checkbox"] {
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
 input[type="text"],
 input[type="number"],
 input[type="date"],
 input[type="time"],
+input[type="datetime-local"],
 select,
 textarea {
     width: 100%;
@@ -211,6 +216,8 @@ textarea {
     border-radius: 8px;
     box-sizing: border-box;
     transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    font-family: 'Segoe UI', sans-serif;
+    color: #333;
 }
 
 input:focus,
@@ -230,58 +237,44 @@ textarea {
 .button-container {
     grid-column: 1 / -1;
     text-align: right;
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
 }
 
-button {
+button, .btn {
     padding: 12px 25px;
     background: linear-gradient(45deg, #2A4687, #1a2f5a);
-    color: #fff;
+    color: #fff !important;
     border: none;
     border-radius: 8px;
     cursor: pointer;
     font-size: 1rem;
     font-weight: bold;
     transition: background 0.3s ease, transform 0.2s ease;
+    text-decoration: none;
+    display: inline-block;
 }
 
-button:hover {
+button:hover, .btn:hover {
     background: linear-gradient(45deg, #1a2f5a, #122344);
     transform: scale(1.05);
+    color: #fff !important;
 }
 
-.intranet-btn {
-    position: absolute;
-    left: 20px;
-    top: 50%;
-    transform: translateY(-50%);
-    padding: 8px 18px;
-    background: linear-gradient(45deg, #6c757d, #5a6268);
-    color: #fff;
-    text-decoration: none;
-    border-radius: 8px;
-    font-weight: bold;
-    transition: background 0.3s ease, transform 0.2s ease;
-    z-index: 10;
-}
-
-.intranet-btn:hover {
-    background: linear-gradient(45deg, #5a6268, #4e555b);
-    transform: translateY(-50%) scale(1.05);
-}
-
-.delete-btn {
+.delete-btn, .btn-danger {
     background: linear-gradient(45deg, #dc3545, #c82333);
 }
 
-.delete-btn:hover {
+.delete-btn:hover, .btn-danger:hover {
     background: linear-gradient(45deg, #c82333, #bd2130);
 }
 
-.add-btn {
+.add-btn, .btn-success {
     background: linear-gradient(45deg, #28a745, #218838);
 }
 
-.add-btn:hover {
+.add-btn:hover, .btn-success:hover {
     background: linear-gradient(45deg, #218838, #1e7e34);
 }
 
@@ -297,6 +290,7 @@ td {
     padding: 15px;
     border-bottom: 1px solid #ddd;
     text-align: left;
+    vertical-align: middle;
 }
 
 th {
@@ -309,113 +303,23 @@ tbody tr:hover {
     background-color: #f9f9f9;
 }
 
-td button {
-    margin-right: 5px;
-    padding: 8px 12px;
-    font-size: 0.9rem;
-}
-
-/* Modal / Pop-ups */
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.6);
-    display: none;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-    padding: 20px;
-    box-sizing: border-box;
-}
-
-.modal-content {
-    position: relative;
-    max-height: 90vh;
-    overflow-y: auto;
-    width: 100%;
-    max-width: 900px;
-}
-
-.modal-content .card {
-    margin-bottom: 0;
-}
-
-.close-btn {
-    position: absolute;
-    top: 15px;
-    right: 35px;
-    font-size: 2.5rem;
-    font-weight: bold;
-    color: #888;
+td .btn-editar,
+td .btn-apagar {
+    background: none;
+    border: none;
+    padding: 5px 10px;
+    font-size: 1.2rem;
     cursor: pointer;
-    z-index: 1001;
+    transition: transform 0.2s;
 }
-
-.close-btn:hover {
-    color: #000;
+td .btn-editar:hover,
+td .btn-apagar:hover {
+    transform: scale(1.2);
 }
-
-/* Barra de Ferramentas */
-.toolbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.5rem;
-    flex-wrap: wrap;
-    gap: 1rem;
-}
-
-.search-container {
-    flex-grow: 1;
-}
+td .btn-editar { color: #2A4687; }
+td .btn-apagar { color: #dc3545; }
 
 /* Dashboard e Relatórios */
-.dashboard-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-    gap: 2rem;
-    margin-top: 2rem;
-}
-
-.report-card {
-    background: #f9f9f9;
-    border-radius: 10px;
-    padding: 1.5rem;
-    display: flex;
-    align-items: center;
-    text-decoration: none;
-    color: inherit;
-    border: 1px solid #eee;
-    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
-}
-
-.report-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-    border-color: #2A4687;
-}
-
-.report-icon {
-    font-size: 2.5rem;
-    color: #2A4687;
-    margin-right: 1.5rem;
-    flex-shrink: 0;
-}
-
-.report-content h3 {
-    margin: 0 0 0.5rem 0;
-    color: #333;
-}
-
-.report-content p {
-    margin: 0;
-    color: #666;
-    font-size: 0.9rem;
-}
-
 .summary-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -444,19 +348,16 @@ td button {
     border-radius: 50%;
     margin-right: 1.5rem;
     color: #fff;
+    width: 64px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.icon-total {
-    background-color: #2A4687;
-}
-
-.icon-externo {
-    background-color: #ffc107;
-}
-
-.icon-manutencao {
-    background-color: #dc3545;
-}
+.icon-total { background-color: #2A4687; }
+.icon-externo { background-color: #1cc88a; }
+.icon-manutencao { background-color: #f6c23e; }
 
 .summary-content h3 {
     margin: 0;
@@ -468,4 +369,246 @@ td button {
     margin: 0;
     color: #666;
     font-weight: bold;
+}
+
+/* Animação */
+@keyframes blink {
+    0% { background-color: #f8d7da; }
+    50% { background-color: #e09da1; }
+    100% { background-color: #f8d7da; }
+}
+
+.blinking-alert {
+    display: none;
+    animation: blink 1.5s infinite;
+    font-weight: bold;
+    text-align: center;
+}
+/* Estilos Específicos da Página de OS */
+
+#lista-oss {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 1.5rem;
+    width: 100%;
+}
+
+.oss-card {
+    position: relative;
+    border: 1px solid #e0e0e0;
+    border-left-width: 5px;
+    border-radius: 10px;
+    transition: all 0.2s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    background-color: #fff;
+}
+
+.oss-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(42, 70, 135, 0.15);
+}
+
+.oss-card.normal { border-left-color: #2A4687; }
+.oss-card.parado { 
+    border-left-color: #dc3545;
+    box-shadow: 0 0 12px rgba(220, 53, 69, 0.5);
+}
+
+.oss-card-header, .oss-card-body, .oss-card-footer {
+    padding: 1rem;
+}
+
+.oss-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.oss-card-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #1a2f5a;
+}
+
+.oss-card-os-tag {
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: #6c757d;
+}
+
+.oss-card-body {
+    flex-grow: 1;
+    color: #555;
+}
+
+.oss-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #f9f9f9;
+    border-top: 1px solid #f0f0f0;
+    font-size: 0.9rem;
+}
+
+.oss-card .stretched-link::after {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1;
+    content: "";
+}
+
+/* Estilos para Modais e Formulários Internos */
+
+.modal-body .form-control,
+.modal-body .form-select {
+    padding: 12px !important;
+    border-radius: 10px !important;
+    border: 1px solid #ccc !important;
+}
+.modal-body .form-control:focus,
+.modal-body .form-select:focus {
+    border-color: #2A4687 !important;
+    box-shadow: 0 0 8px rgba(42, 70, 135, 0.2) !important;
+}
+
+/* NOVO: Estilo para campos readonly no modal para maior clareza */
+.modal-body input[readonly],
+.modal-body textarea[readonly] {
+    background-color: #e9ecef; /* Cor padrão do Bootstrap para inputs desabilitados */
+    cursor: not-allowed;
+    opacity: 1; /* Garante que o texto não fique esmaecido */
+}
+
+.modal-footer .btn-primary {
+    background: linear-gradient(45deg, #2A4687, #1a2f5a) !important;
+    border: none !important;
+    
+}
+.modal-footer .btn-primary:hover {
+    background: linear-gradient(45deg, #1a2f5a, #122344) !important;
+}
+
+.modal-footer .btn-secondary {
+    background: linear-gradient(45deg, #6c757d, #5a6268) !important;
+    border: none !important;
+}
+.modal-footer .btn-secondary:hover {
+    background: linear-gradient(45deg, #5a6268, #4e555b) !important;
+}
+
+.form-section {
+    width: 100%;
+    margin-bottom: 1.5rem;
+}
+
+.form-section:last-of-type {
+    margin-bottom: 0;
+}
+
+.form-section-title {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #2A4687;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #eee;
+    width: 100%;
+}
+/* NOVO: Estilos para corrigir a paginação da tabela (DataTables) */
+
+.dataTables_wrapper .dataTables_paginate {
+    float: right;
+    text-align: right;
+    padding-top: 0.75em;
+}
+
+.dataTables_paginate .pagination {
+    display: flex;
+    list-style: none; /* Remove os marcadores de lista */
+    padding-left: 0;   /* Remove o espaçamento padrão da lista */
+    margin: 0;
+}
+
+.dataTables_paginate .pagination .page-item {
+    margin: 0 2px; /* Adiciona um pequeno espaço entre os botões */
+}
+
+.dataTables_paginate .pagination .page-link {
+    position: relative;
+    display: block;
+    padding: 0.5rem 0.85rem;
+    text-decoration: none;
+    background-color: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+    color: #2A4687; /* Cor principal do seu tema */
+    transition: all 0.2s ease-in-out;
+}
+
+.dataTables_paginate .pagination .page-link:hover {
+    z-index: 2;
+    color: #1a2f5a;
+    background-color: #e9ecef;
+    border-color: #dee2e6;
+}
+
+/* Estilo para a página ativa */
+.dataTables_paginate .pagination .page-item.active .page-link {
+    z-index: 3;
+    color: #fff;
+    background-color: #2A4687;
+    border-color: #2A4687;
+}
+
+/* Estilo para os botões desabilitados (Previous/Next) */
+.dataTables_paginate .pagination .page-item.disabled .page-link {
+    color: #6c757d;
+    pointer-events: none;
+    background-color: #fff;
+    border-color: #dee2e6;
+}
+
+/* Ajustes de alinhamento para os elementos da tabela */
+.dataTables_wrapper .dataTables_length,
+.dataTables_wrapper .dataTables_filter {
+    padding-top: 0.75em;
+}
+/* --- CSS ADICIONAL PARA MELHORAR O FORMULÁRIO DA OS --- */
+
+/* Aumenta o tamanho e a legibilidade dos campos de preenchimento */
+.form-control-lg-custom {
+    padding: 0.8rem 1.1rem;
+    font-size: 1.1rem; /* Fonte maior dentro do campo */
+    line-height: 1.5;
+    border-radius: 8px; /* Bordas mais suaves */
+}
+
+/* Aumenta o tamanho das labels para acompanhar os campos */
+.form-section .form-label {
+    font-size: 1rem;
+    font-weight: 600; /* Fonte um pouco mais forte */
+    color: #343a40;
+}
+
+/* Estilo para campos "somente leitura" para diferenciá-los claramente */
+.form-control-plaintext {
+    font-size: 1.1rem;
+    padding-left: 10px;
+    border-bottom: 1px solid #e9ecef;
+}
+
+textarea.form-control-plaintext {
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 10px;
+}
+.form-check-input-lg {
+    width: 3.5rem;
+    height: 1.8rem;
 }
