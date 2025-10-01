@@ -73,8 +73,10 @@ elseif ($action === 'get_details') {
     $sql_status = "SELECT TAGStatus FROM SGM_TAGStatus";
     $stmt_status = sqlsrv_query($conn, $sql_status);
     $status_list = [];
-    while($row = sqlsrv_fetch_array($stmt_status, SQLSRV_FETCH_ASSOC)){
-        $status_list[] = $row['TAGStatus'];
+    if($stmt_status){
+        while($row = sqlsrv_fetch_array($stmt_status, SQLSRV_FETCH_ASSOC)){
+            $status_list[] = $row['TAGStatus'];
+        }
     }
     $details['status_options'] = $status_list;
     
