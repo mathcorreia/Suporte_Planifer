@@ -1,7 +1,8 @@
 /* Fonte e Geral */
+
 @font-face {
     font-family: 'StaraBlack';
-    src: url('img/Stara-Black.woff') format('woff');
+    src: url('../../img/Stara-Black.woff') format('woff'); 
     font-weight: normal;
     font-style: normal;
 }
@@ -13,7 +14,12 @@ body {
     padding: 0;
     color: #2A4687;
     background-color: #f4f7fa;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
+
+/* ... o resto do seu código CSS permanece exatamente o mesmo ... */
 
 .img-fundo {
     position: fixed;
@@ -58,6 +64,9 @@ h2 {
     color: #2A4687;
     border-bottom: 2px solid #eee;
     padding-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 nav {
@@ -85,18 +94,91 @@ nav a.active {
 /* Conteúdo Principal e Cards */
 main {
     padding: 2rem 1rem;
-    max-width: 1200px;
+    max-width: 1400px;
     width: 100%;
     margin: 2rem auto;
     box-sizing: border-box;
+    flex-grow: 1; 
 }
 
 .card {
     background: #fff;
-    padding: 2.5rem;
+    padding: 1.5rem;
     border-radius: 15px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
     margin-bottom: 2rem;
+}
+
+/* Estilos para a Página da Intranet */
+.intranet-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.intranet-grid .card {
+    display: flex;
+    flex-direction: column;
+}
+
+.card h2 i {
+    margin-right: 12px;
+    color: #2A4687;
+}
+
+ul.links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    flex-grow: 1;
+}
+
+ul.links li {
+    margin: 0;
+    border-bottom: 1px solid #eee;
+}
+
+ul.links li:last-child {
+    border-bottom: none;
+}
+
+ul.links a {
+    text-decoration: none;
+    color: #2A4687;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    padding: 12px 8px;
+    border-radius: 8px;
+}
+
+ul.links a:hover {
+    color: #1a2f5a;
+    background-color: #f4f7fa;
+    transform: translateX(5px);
+}
+
+ul.links a::before {
+    content: '\f105';
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    margin-right: 10px;
+    transition: transform 0.3s ease;
+}
+
+ul.links a:hover::before {
+    transform: translateX(5px);
+}
+
+
+footer {
+    text-align: center;
+    background-color: #2A4687;
+    color: #e0e0e0; 
+    font-size: 0.9rem;
+    padding: 20px 0; 
+    margin-top: auto; 
 }
 
 /* Formulários e Inputs */
@@ -170,7 +252,7 @@ button:hover {
 .intranet-btn {
     position: absolute;
     left: 20px;
-    top: 50%; /* Centraliza verticalmente no header */
+    top: 50%;
     transform: translateY(-50%);
     padding: 8px 18px;
     background: linear-gradient(45deg, #6c757d, #5a6268);
@@ -231,4 +313,159 @@ td button {
     margin-right: 5px;
     padding: 8px 12px;
     font-size: 0.9rem;
+}
+
+/* Modal / Pop-ups */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.modal-content {
+    position: relative;
+    max-height: 90vh;
+    overflow-y: auto;
+    width: 100%;
+    max-width: 900px;
+}
+
+.modal-content .card {
+    margin-bottom: 0;
+}
+
+.close-btn {
+    position: absolute;
+    top: 15px;
+    right: 35px;
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #888;
+    cursor: pointer;
+    z-index: 1001;
+}
+
+.close-btn:hover {
+    color: #000;
+}
+
+/* Barra de Ferramentas */
+.toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.search-container {
+    flex-grow: 1;
+}
+
+/* Dashboard e Relatórios */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.report-card {
+    background: #f9f9f9;
+    border-radius: 10px;
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: inherit;
+    border: 1px solid #eee;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.report-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    border-color: #2A4687;
+}
+
+.report-icon {
+    font-size: 2.5rem;
+    color: #2A4687;
+    margin-right: 1.5rem;
+    flex-shrink: 0;
+}
+
+.report-content h3 {
+    margin: 0 0 0.5rem 0;
+    color: #333;
+}
+
+.report-content p {
+    margin: 0;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.summary-card {
+    background: #fff;
+    border-radius: 15px;
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.summary-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+}
+
+.summary-icon {
+    font-size: 2.5rem;
+    padding: 15px;
+    border-radius: 50%;
+    margin-right: 1.5rem;
+    color: #fff;
+}
+
+.icon-total {
+    background-color: #2A4687;
+}
+
+.icon-externo {
+    background-color: #ffc107;
+}
+
+.icon-manutencao {
+    background-color: #dc3545;
+}
+
+.summary-content h3 {
+    margin: 0;
+    font-size: 2.2rem;
+    color: #333;
+}
+
+.summary-content p {
+    margin: 0;
+    color: #666;
+    font-weight: bold;
 }

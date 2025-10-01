@@ -4,65 +4,56 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Sistema de Gestão</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <style>
-    body { background-color: #f8f9fa; }
-    .sidebar { height: 100vh; position: fixed; top: 0; left: 0; width: 240px; background-color: #343a40; color: white; padding-top: 1rem; }
-    .sidebar-header { text-align: center; margin-bottom: 1rem; }
-    .sidebar a { color: #ccc; text-decoration: none; padding: 10px 20px; display: block; cursor: pointer; }
-    .sidebar a:hover, .sidebar a.active { background-color: #495057; color: white; }
-    .main-content { margin-left: 240px; padding: 2rem; }
-    iframe { border: none; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); width: 100%; height: 90vh; display: none; }
-  </style>
+  <link rel="stylesheet" href="./css/style.css">
 </head>
 <body>
 
-<div class="sidebar">
-  <div class="sidebar-header">
-    <h4>Menu Principal</h4>
-  </div>
-  <a onclick="carregarModulo('Dashboard')" id="menuDashboard">Dashboard</a>
-  <a onclick="carregarModulo('OS')" id="menuOS">Ordens de Serviço</a>
-  <a onclick="carregarModulo('Relatorios')" id="menuRelatorios">Relatórios</a>
-  <hr style="border-color: #6c757d;">
-  <small style="padding: 10px 20px; color: #6c757d; text-transform: uppercase;">Cadastros</small>
-  <a onclick="carregarModulo('Ativos')" id="menuAtivos">Ativos</a>
-  <a onclick="carregarModulo('Setores')" id="menuSetores">Setores</a>
-  <a onclick="carregarModulo('Usuarios')" id="menuUsuarios">Usuários</a>
-  <a onclick="carregarModulo('Tarefas')" id="menuTarefas">Tarefas</a>
-</div>
+<header>
+  <h1>Sistema de Gestão</h1>
+</header>
+<nav id="main-nav">
+  <a href="#" class="nav-link active" data-page="dashboard" data-title="Dashboard Principal">Dashboard</a>
+  <a href="#" class="nav-link" data-page="paginas/OS/ordem_servico" data-title="Ordens de Serviço">Ordens de Serviço</a>
+  <a href="#" class="nav-link" data-page="paginas/Relatorios/relatorios" data-title="Relatórios">Relatórios</a>
+  <a href="#" class="nav-link" data-page="paginas/Ativos/ativos" data-title="Cadastro de Ativos">Ativos</a>
+  <a href="#" class="nav-link" data-page="paginas/Setores/setores" data-title="Cadastro de Setores">Setores</a>
+  <a href="#" class="nav-link" data-page="paginas/Usuarios/usuarios" data-title="Cadastro de Usuários">Usuários</a>
+  <a href="#" class="nav-link" data-page="paginas/Tarefas/tarefas" data-title="Cadastro de Tarefas">Tarefas</a>
+  <a href="#" class="nav-link" data-page="paginas/status/status" data-title="Cadastro de Status de OS">Status de OS</a>
+</nav>
 
-<div class="main-content">
-  <h2 id="tituloModulo" class="mb-4">Bem-vindo</h2>
-  <iframe id="iframeModulo"></iframe>
-</div>
+<main id="content-area">
+  </main>
 
+<footer>
+  © 2025 - Todos os direitos reservados.
+</footer>
+
+<script src="https://code.jquery.com/jquery-3.7.0.js"></script>
 <script>
-function carregarModulo(modulo) {
-  const modulosInfo = {
-    Dashboard: { titulo: "Dashboard Principal", path: "dashboard.php" },
-    OS: { titulo: "Ordens de Serviço de Suporte", path: "paginas/OS/ordem_servico.php" },
-    Relatorios: { titulo: "Relatórios do Sistema", path: "paginas/Relatorios/relatorios.php" },
-    Ativos: { titulo: "Cadastro de Ativos", path: "paginas/Ativos/ativos.php" },
-    Setores: { titulo: "Cadastro de Setores", path: "paginas/Setores/setores.php" },
-    Usuarios: { titulo: "Gestão de Usuários", path: "paginas/Usuarios/usuarios.php" },
-    Tarefas: { titulo: "Cadastro de Tarefas", path: "paginas/Tarefas/tarefas.php" }
-  };
+function carregarConteudo(pagina, titulo) {
+    const contentArea = $('#content-area');
+    contentArea.html(`<h2>${titulo}</h2>`); // Adiciona o título
 
-  const info = modulosInfo[modulo];
-  if (!info) return;
-
-  document.getElementById('tituloModulo').innerText = info.titulo;
-  const iframe = document.getElementById('iframeModulo');
-  iframe.src = info.path + "?nocache=" + Date.now();
-  iframe.style.display = 'block';
-
-  document.querySelectorAll('.sidebar a').forEach(el => el.classList.remove('active'));
-  document.getElementById('menu' + modulo)?.classList.add('active');
+    $.get(pagina + '.php', function(data) {
+        contentArea.append(data); // Adiciona o conteúdo da página
+    }).fail(function() {
+        contentArea.html(`<h2 style="color: red;">Erro ao carregar a página: ${pagina}.php</h2>`);
+    });
 }
 
-document.addEventListener("DOMContentLoaded", function() {
-    carregarModulo('Dashboard');
+$(document).ready(function() {
+    $('.nav-link').on('click', function(e) {
+        e.preventDefault();
+        $('.nav-link').removeClass('active');
+        $(this).addClass('active');
+        
+        const pagina = $(this).data('page');
+        const titulo = $(this).data('title');
+        carregarConteudo(pagina, titulo);
+    });
+
+    carregarConteudo('dashboard', 'Dashboard Principal');
 });
 </script>
 
