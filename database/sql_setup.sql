@@ -53,6 +53,7 @@ CREATE TABLE [dbo].SGM_OS (
 	Data_Inicio_Atendimento DATETIME NULL,
 	Data_Fim_Atendimento DATETIME NULL,
 	Descricao_Servico TEXT NULL
+	Maquina_Parada BIT NULL
 );
 END
 GO
