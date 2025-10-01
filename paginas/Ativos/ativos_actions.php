@@ -7,11 +7,14 @@ header('Content-Type: application/json');
 $action = $_POST['action'] ?? '';
 
 if ($action === 'get') {
-    $sql = "SELECT Ativo_TAG as ativo_tag, Descricao as descricao, Modelo as modelo, Numero_Serie as numero_serie, Setor_TAG as setor_tag, Tipo as tipo FROM SGM_Ativos";
+    $sql = "SELECT * FROM SGM_Ativos";
     $stmt = sqlsrv_query($conn, $sql);
     $ativos = [];
     if ($stmt) {
         while ($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
+            if ($row['Instalacao'] instanceof DateTime) {
+                $row['Instalacao'] = $row['Instalacao']->format('Y-m-d');
+            }
             $ativos[] = $row;
         }
     }
@@ -19,18 +22,34 @@ if ($action === 'get') {
 }
 elseif ($action === 'save') {
     $tagOriginal = $_POST['ativo_tag_original'] ?? '';
+    
     $params = [
-        'ativo_tag' => $_POST['ativo_tag'] ?? '',
-        'descricao' => $_POST['descricao'] ?? '',
-        'modelo' => $_POST['modelo'] ?? '',
-        'numero_serie' => $_POST['numero_serie'] ?? '',
-        'setor_tag' => $_POST['setor_tag'] ?? '',
-        'tipo' => $_POST['tipo'] ?? ''
+        'Ativo_TAG' => $_POST['Ativo_TAG'] ?? '',
+        'Setor_TAG' => $_POST['Setor_TAG'] ?? null,
+        'Descricao' => $_POST['Descricao'] ?? null,
+        'Modelo' => $_POST['Modelo'] ?? null,
+        'Numero_Serie' => $_POST['Numero_Serie'] ?? null,
+        'Ferramenta' => isset($_POST['Ferramenta']) ? 1 : 0,
+        'Maquina' => isset($_POST['Maquina']) ? 1 : 0,
+        'Tipo' => $_POST['Tipo'] ?? null,
+        'Sensor' => $_POST['Sensor'] ?? null,
+        'Comando' => $_POST['Comando'] ?? null,
+        'Rede_Eletrica_TAG' => $_POST['Rede_Eletrica_TAG'] ?? null,
+        'Instalacao' => empty($_POST['Instalacao']) ? null : $_POST['Instalacao'],
+        'Corrente' => empty($_POST['Corrente']) ? null : (int)$_POST['Corrente'],
+        'Turno1' => isset($_POST['Turno1']) ? 1 : 0,
+        'Turno2' => isset($_POST['Turno2']) ? 1 : 0,
+        'Turno3' => isset($_POST['Turno3']) ? 1 : 0,
+        'Controle' => isset($_POST['Controle']) ? 1 : 0,
     ];
 
     if (!empty($tagOriginal)) {
-        // Lógica de ATUALIZAÇÃO (EDIÇÃO)
-        $sql = "UPDATE SGM_Ativos SET Ativo_TAG = ?, Descricao = ?, Modelo = ?, Numero_Serie = ?, Setor_TAG = ?, Tipo = ? WHERE Ativo_TAG = ?";
+        $sql_parts = [];
+        foreach ($params as $key => $value) {
+            $sql_parts[] = "$key = ?";
+        }
+        $sql = "UPDATE SGM_Ativos SET " . implode(', ', $sql_parts) . " WHERE Ativo_TAG = ?";
+        
         $query_params = array_values($params);
         $query_params[] = $tagOriginal;
         
@@ -41,8 +60,10 @@ elseif ($action === 'save') {
             echo json_encode(["sucesso" => false, "mensagem" => "Erro ao atualizar ativo.", "details" => sqlsrv_errors()]);
         }
     } else {
-        // Lógica de CRIAÇÃO (NOVO)
-        $sql = "INSERT INTO SGM_Ativos (Ativo_TAG, Descricao, Modelo, Numero_Serie, Setor_TAG, Tipo) VALUES (?, ?, ?, ?, ?, ?)";
+        $columns = implode(', ', array_keys($params));
+        $placeholders = implode(', ', array_fill(0, count($params), '?'));
+        $sql = "INSERT INTO SGM_Ativos ($columns) VALUES ($placeholders)";
+        
         $stmt = sqlsrv_query($conn, $sql, array_values($params));
         if ($stmt) {
             echo json_encode(["sucesso" => true, "mensagem" => "Ativo cadastrado com sucesso!"]);
@@ -52,7 +73,7 @@ elseif ($action === 'save') {
     }
 }
 elseif ($action === 'delete') {
-    $tag = $_POST['ativo_tag'] ?? '';
+    $tag = $_POST['Ativo_TAG'] ?? '';
     if (empty($tag)) {
         echo json_encode(["sucesso" => false, "erro" => "TAG do ativo não informada"]);
         exit;

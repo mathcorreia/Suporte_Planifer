@@ -14,16 +14,30 @@
     <div class="card-body">
       <form id="formAtivo" class="row g-3">
         <input type="hidden" name="ativo_tag_original">
-        <div class="col-md-3"><label class="form-label">TAG do Ativo</label><input type="text" name="ativo_tag" class="form-control" required></div>
-        <div class="col-md-9"><label class="form-label">Descrição</label><input type="text" name="descricao" class="form-control" required></div>
-        <div class="col-md-4"><label class="form-label">Modelo</label><input type="text" name="modelo" class="form-control"></div>
-        <div class="col-md-4"><label class="form-label">Número de Série</label><input type="text" name="numero_serie" class="form-control"></div>
-        <div class="col-md-4">
-          <label class="form-label">Setor</label>
-          <select name="setor_tag" class="form-select" required></select>
-        </div>
-        <div class="col-md-4"><label class="form-label">Tipo</label><select name="tipo" class="form-select"><option value="">Selecione...</option><option value="TCNC">TCNC</option><option value="FCNC">FCNC</option><option value="MANUAL">MANUAL</option><option value="INFO">INFO</option><option value="PREDIAL">PREDIAL</option><option value="MAQUINA">MAQUINA</option><option value="OUTRO">OUTRO</option></select></div>
-        <div class="col-12"><button type="submit" class="btn btn-primary">Salvar</button><button type="button" class="btn btn-secondary" id="btnNovo">Novo</button></div>
+        
+        <div class="col-md-3"><label class="form-label">TAG do Ativo</label><input type="text" name="Ativo_TAG" class="form-control" required></div>
+        <div class="col-md-6"><label class="form-label">Descrição</label><input type="text" name="Descricao" class="form-control" required></div>
+        <div class="col-md-3"><label class="form-label">Setor</label><select name="Setor_TAG" class="form-select" required></select></div>
+
+        <div class="col-md-3"><label class="form-label">Modelo</label><input type="text" name="Modelo" class="form-control"></div>
+        <div class="col-md-3"><label class="form-label">Número de Série</label><input type="text" name="Numero_Serie" class="form-control"></div>
+        <div class="col-md-3"><label class="form-label">Tipo</label><input type="text" name="Tipo" class="form-control"></div>
+        <div class="col-md-3"><label class="form-label">Data de Instalação</label><input type="date" name="Instalacao" class="form-control"></div>
+
+        <div class="col-md-3"><label class="form-label">Sensor</label><input type="text" name="Sensor" class="form-control"></div>
+        <div class="col-md-3"><label class="form-label">Comando</label><input type="text" name="Comando" class="form-control"></div>
+        <div class="col-md-3"><label class="form-label">Rede Elétrica TAG</label><input type="text" name="Rede_Eletrica_TAG" class="form-control"></div>
+        <div class="col-md-3"><label class="form-label">Corrente</label><input type="number" name="Corrente" class="form-control"></div>
+        
+        <div class="col-12"><hr></div>
+        <div class="col-md-2"><div class="form-check"><input class="form-check-input" type="checkbox" name="Ferramenta" value="1"><label class="form-check-label">Ferramenta</label></div></div>
+        <div class="col-md-2"><div class="form-check"><input class="form-check-input" type="checkbox" name="Maquina" value="1"><label class="form-check-label">Máquina</label></div></div>
+        <div class="col-md-2"><div class="form-check"><input class="form-check-input" type="checkbox" name="Controle" value="1"><label class="form-check-label">Controle</label></div></div>
+        <div class="col-md-2"><div class="form-check"><input class="form-check-input" type="checkbox" name="Turno1" value="1"><label class="form-check-label">Turno 1</label></div></div>
+        <div class="col-md-2"><div class="form-check"><input class="form-check-input" type="checkbox" name="Turno2" value="1"><label class="form-check-label">Turno 2</label></div></div>
+        <div class="col-md-2"><div class="form-check"><input class="form-check-input" type="checkbox" name="Turno3" value="1"><label class="form-check-label">Turno 3</label></div></div>
+
+        <div class="col-12 mt-4"><button type="submit" class="btn btn-primary">Salvar</button><button type="button" class="btn btn-secondary" id="btnNovo">Novo</button></div>
       </form>
     </div>
   </div>
@@ -41,18 +55,15 @@ $(document).ready(function() {
   let tabela;
 
   function carregarSetoresDropdown() {
-      // CORRIGIDO: O caminho agora usa 'Setores' com 'S' maiúsculo, como na sua versão que funciona.
       $.post('../Setores/setores_actions.php', { action: 'get' }, function(data) {
-          const select = $('select[name="setor_tag"]');
+          const select = $('select[name="Setor_TAG"]');
           select.empty().append('<option value="">Selecione um setor...</option>');
           if(Array.isArray(data)) {
               data.forEach(setor => {
                   select.append(`<option value="${setor.setor_tag}">${setor.setor_tag} - ${setor.descricao}</option>`);
               });
           }
-      }, 'json').fail(function() {
-          alert("Falha ao carregar a lista de setores. Verifique o caminho e as permissões da pasta 'Setores'.");
-      });
+      }, 'json');
   }
 
   function carregarAtivos() {
@@ -61,34 +72,45 @@ $(document).ready(function() {
       tabela.clear();
       if (Array.isArray(data)) {
         data.forEach(ativo => {
-          const acoesHtml = `<button class="btn btn-sm btn-primary btn-editar">✏️</button> <button class="btn btn-sm btn-danger btn-apagar" data-tag="${ativo.ativo_tag}">🗑️</button>`;
-          const linha = tabela.row.add([ ativo.ativo_tag, ativo.descricao, ativo.setor_tag, ativo.tipo, acoesHtml ]).draw().node();
+          const acoesHtml = `<button class="btn btn-sm btn-primary btn-editar">✏️</button> <button class="btn btn-sm btn-danger btn-apagar" data-tag="${ativo.Ativo_TAG}">🗑️</button>`;
+          const linha = tabela.row.add([ ativo.Ativo_TAG, ativo.Descricao, ativo.Setor_TAG, ativo.Tipo, acoesHtml ]).draw().node();
           $(linha).data('ativo', ativo);
         });
       }
     }, 'json');
   }
 
-  $('#formAtivo').submit(function(e) { e.preventDefault(); $.ajax({ url: 'ativos_actions.php', type: 'POST', data: $(this).serialize() + '&action=save', dataType: 'json', success: function(res) { if (res.sucesso) { alert(res.mensagem); carregarAtivos(); limparFormulario(); } else { let errorMsg = res.mensagem || res.erro || "Ocorreu um erro desconhecido."; if (res.details && res.details[0]) { errorMsg += "\\nDetalhes: " + res.details[0].message; } alert(errorMsg); } }, error: function(jqXHR) { alert("Falha grave: " + jqXHR.responseText); } }); });
+  $('#formAtivo').submit(function(e) { e.preventDefault(); $.ajax({ url: 'ativos_actions.php', type: 'POST', data: $(this).serialize() + '&action=save', dataType: 'json', success: function(res) { if (res.sucesso) { alert(res.mensagem); carregarAtivos(); limparFormulario(); } else { alert(res.mensagem || res.erro); } }, error: function(jqXHR) { alert("Falha grave: " + jqXHR.responseText); } }); });
 
   $('#ativosTable tbody').on('click', '.btn-editar', function () {
     const ativo = $(this).closest('tr').data('ativo');
     if (ativo) {
-      $('input[name="ativo_tag_original"]').val(ativo.ativo_tag);
-      $('input[name="ativo_tag"]').val(ativo.ativo_tag).prop('readonly', true);
-      $('input[name="descricao"]').val(ativo.descricao);
-      $('input[name="modelo"]').val(ativo.modelo);
-      $('input[name="numero_serie"]').val(ativo.numero_serie);
-      $('select[name="setor_tag"]').val(ativo.setor_tag);
-      $('select[name="tipo"]').val(ativo.tipo);
+      $('input[name="ativo_tag_original"]').val(ativo.Ativo_TAG);
+      $('input[name="Ativo_TAG"]').val(ativo.Ativo_TAG).prop('readonly', true);
+      $('input[name="Descricao"]').val(ativo.Descricao);
+      $('select[name="Setor_TAG"]').val(ativo.Setor_TAG);
+      $('input[name="Modelo"]').val(ativo.Modelo);
+      $('input[name="Numero_Serie"]').val(ativo.Numero_Serie);
+      $('input[name="Tipo"]').val(ativo.Tipo);
+      $('input[name="Instalacao"]').val(ativo.Instalacao);
+      $('input[name="Sensor"]').val(ativo.Sensor);
+      $('input[name="Comando"]').val(ativo.Comando);
+      $('input[name="Rede_Eletrica_TAG"]').val(ativo.Rede_Eletrica_TAG);
+      $('input[name="Corrente"]').val(ativo.Corrente);
+      $('input[name="Ferramenta"]').prop('checked', ativo.Ferramenta == 1);
+      $('input[name="Maquina"]').prop('checked', ativo.Maquina == 1);
+      $('input[name="Controle"]').prop('checked', ativo.Controle == 1);
+      $('input[name="Turno1"]').prop('checked', ativo.Turno1 == 1);
+      $('input[name="Turno2"]').prop('checked', ativo.Turno2 == 1);
+      $('input[name="Turno3"]').prop('checked', ativo.Turno3 == 1);
       window.scrollTo(0, 0);
     }
   });
 
-  $('#ativosTable tbody').on('click', '.btn-apagar', function (e) {
+  $('#ativosTable tbody').on('click', '.btn-apagar', function () {
     const tag = $(this).data('tag');
     if (confirm(`Deseja realmente apagar o ativo ${tag}?`)) {
-      $.post('ativos_actions.php', { action: 'delete', ativo_tag: tag }, function (res) {
+      $.post('ativos_actions.php', { action: 'delete', Ativo_TAG: tag }, function (res) {
         alert(res.mensagem || res.erro);
         if(res.sucesso) carregarAtivos();
       }, 'json');
@@ -99,7 +121,7 @@ $(document).ready(function() {
   function limparFormulario() {
       $('#formAtivo')[0].reset();
       $('input[name="ativo_tag_original"]').val('');
-      $('input[name="ativo_tag"]').prop('readonly', false);
+      $('input[name="Ativo_TAG"]').prop('readonly', false);
   }
 
   carregarSetoresDropdown();
