@@ -11,6 +11,7 @@
 
 <header>
   <h1>Sistema de Gestão</h1>
+  <img src="./css/logo.png" alt="Logo do Sistema" class="img-logo" style="height: auto; border: 5px; ">
 </header>
 <nav id="main-nav">
   <a href="#" class="nav-link active" data-page="dashboard" data-title="Dashboard Principal">Dashboard</a>
@@ -20,9 +21,12 @@
   <a href="#" class="nav-link" data-page="paginas/Setores/setores" data-title="Cadastro de Setores">Setores</a>
   <a href="#" class="nav-link" data-page="paginas/Usuarios/usuarios" data-title="Cadastro de Usuários">Usuários</a>
   <a href="#" class="nav-link" data-page="paginas/Tarefas/tarefas" data-title="Cadastro de Tarefas">Tarefas</a>
+  <a href="#" class="nav-link" data-page="paginas/melhorias/melhorias" data-title="Melhorias de Sistemas">Melhorias de Sistemas</a>
 </nav>
-
+<img src="./css/logo_diag.png" alt="tela de fundo" class="img-fundo">
 <main id="content-area">
+
+
   </main>
 
 <footer>
@@ -33,10 +37,10 @@
 <script>
 function carregarConteudo(pagina, titulo) {
     const contentArea = $('#content-area');
-    contentArea.html(`<h2>${titulo}</h2>`); // Adiciona o título
+    contentArea.html(`<h2>${titulo}</h2>`); 
 
     $.get(pagina + '.php', function(data) {
-        contentArea.append(data); // Adiciona o conteúdo da página
+        contentArea.append(data); 
     }).fail(function() {
         contentArea.html(`<h2 style="color: red;">Erro ao carregar a página: ${pagina}.php</h2>`);
     });

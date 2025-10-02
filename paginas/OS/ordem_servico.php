@@ -1,8 +1,8 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
-    /* Estilos para garantir a compatibilidade entre os dois CSS */
-    .card.oss-card { border-left-width: 5px; margin-bottom: 0; padding: 1.5rem; }
+    
+    .card.oss-card { border-left-width: 5px; margin-bottom: 0; padding: 1.5rem; width: auto; }
     .card.parado { border-left-color: #dc3545; }
     .card.normal { border-left-color: #2A4687; }
 
@@ -62,15 +62,15 @@
     
     .form-section-title {
         color: #0d6efd;
-        margin-bottom: 1rem;
-        font-weight: 600;
+        margin-bottom: 0.5rem;
+        font-weight: 60;
         font-size: 0.95rem;
         display: flex;
         align-items: center;
     }
     
     .form-section-title i {
-        font-size: 1rem;
+        font-size: 0.5rem;
         width: 20px;
     }
     
@@ -135,7 +135,7 @@
     </button>
 </div>
 
-<div id="lista-oss" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 1.5rem;"></div>
+<div id="lista-oss" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 0.5rem;"></div>
 
 <div class="modal fade" id="modalNovaOSS" tabindex="-1">
     <div class="modal-dialog modal-lg">
@@ -237,12 +237,19 @@ $(document).ready(function() {
                     </div>`;
                     container.append(cardHtml);
                 });
+            } else if (res && res.erro) {
+                // Se o backend retornar um erro específico
+                let errorMessage = 'Erro ao carregar Ordens de Serviço: ' + res.erro;
+                if (res.details) {
+                    errorMessage += '<br><pre>' + JSON.stringify(res.details, null, 2) + '</pre>';
+                }
+                container.html('<div class="alert alert-danger text-center">' + errorMessage + '</div>');
             } else {
                 container.html('<div class="alert alert-success text-center">Nenhuma Ordem de Serviço em aberto!</div>');
             }
         }, 'json')
         .fail(function(jqXHR, textStatus, errorThrown) {
-            $('#lista-oss').html('<div class="alert alert-danger text-center">Erro ao carregar Ordens de Serviço: ' + textStatus + ' - ' + errorThrown + '</div>');
+            $('#lista-oss').html('<div class="alert alert-danger text-center">Erro de comunicação com o servidor: ' + textStatus + ' - ' + errorThrown + '</div>');
         });
     }
 
@@ -275,7 +282,7 @@ $(document).ready(function() {
                     timeStyle: 'short'
                 }) : 'N/A';
             
-            // FORMULÁRIO DE EDIÇÃO COMPACTO
+          
             const formHtml = `
                 <input type="hidden" name="OS_ID" value="${details.OS_ID}">
                 

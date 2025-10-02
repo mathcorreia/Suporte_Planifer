@@ -1,6 +1,10 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+  <a href="//fserver/intranet" id="logout-btn" title="Home" class="intranet-btn">Home</a>
+
+
+
 <div id="maquinaParadaAlert" class="blinking-alert" style="padding: 1rem; margin-bottom: 2rem; background-color: #f8d7da; color: #721c24; border-radius: 8px;"></div>
 <div class="summary-grid">
     <div class="summary-card"><div class="summary-icon icon-total"><i class="fas fa-box"></i></div><div class="summary-content"><h3 id="totalAtivos">--</h3><p>Ativos Totais</p></div></div>

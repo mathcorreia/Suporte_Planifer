@@ -87,7 +87,6 @@ elseif ($action === 'update') {
         exit;
     }
 
-    // CORRIGIDO: Removida a 'Data_Solicitacao' para que não seja alterada
     $params = [
         'Ativo_TAG' => $_POST['Ativo_TAG'] ?? null,
         'Solicitante' => $_POST['Solicitante'] ?? null,
