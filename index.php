@@ -23,7 +23,6 @@
   <a href="#" class="nav-link" data-page="paginas/Usuarios/usuarios" data-title="Cadastro de Usuários">Usuários</a>
   <a href="#" class="nav-link" data-page="paginas/Tarefas/tarefas" data-title="Cadastro de Tarefas">Tarefas</a>
   <a href="#" class="nav-link" data-page="paginas/melhorias/melhorias" data-title="Melhorias de Sistemas">Melhorias de Sistemas</a>
-    <a href="#" class="nav-link" data-page="paginas/status/status" data-title="status">Melhorias de Sistemas</a>
 
 </nav>
 <img src="./css/logo_diag.png" alt="tela de fundo" class="img-fundo">
