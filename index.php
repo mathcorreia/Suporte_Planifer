@@ -6,6 +6,7 @@
   <title>Sistema de Gestão</title>
   
   <link rel="stylesheet" href="./css/style.css">
+  <link rel="icon" href="../intranet/assets/css/favicon.ico" type="image/x-icon">
 </head>
 <body>
 
@@ -22,6 +23,8 @@
   <a href="#" class="nav-link" data-page="paginas/Usuarios/usuarios" data-title="Cadastro de Usuários">Usuários</a>
   <a href="#" class="nav-link" data-page="paginas/Tarefas/tarefas" data-title="Cadastro de Tarefas">Tarefas</a>
   <a href="#" class="nav-link" data-page="paginas/melhorias/melhorias" data-title="Melhorias de Sistemas">Melhorias de Sistemas</a>
+    <a href="#" class="nav-link" data-page="paginas/status/status" data-title="status">Melhorias de Sistemas</a>
+
 </nav>
 <img src="./css/logo_diag.png" alt="tela de fundo" class="img-fundo">
 <main id="content-area">
@@ -34,13 +37,18 @@
 </footer>
 
 <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 <script>
+// Função de carregamento de conteúdo corrigida e robusta
 function carregarConteudo(pagina, titulo) {
     const contentArea = $('#content-area');
-    contentArea.html(`<h2>${titulo}</h2>`); 
-
+    
     $.get(pagina + '.php', function(data) {
-        contentArea.append(data); 
+        // Substitui completamente o conteúdo antigo pelo novo
+        contentArea.html(data); 
+        // Adiciona o título no topo da área de conteúdo
+        contentArea.prepend(`<h2>${titulo}</h2>`);
     }).fail(function() {
         contentArea.html(`<h2 style="color: red;">Erro ao carregar a página: ${pagina}.php</h2>`);
     });
@@ -57,9 +65,9 @@ $(document).ready(function() {
         carregarConteudo(pagina, titulo);
     });
 
-    carregarConteudo('dashboard', 'Dashboard Principal');
+    // Carrega a página inicial
+    carregarConteudo('dashboard', 'Dashboard');
 });
 </script>
-
 </body>
 </html>
