@@ -447,7 +447,9 @@ td .btn-apagar { color: #dc3545; }
     font-weight: bold;
     color: #6c757d;
 }
-
+.row{
+    margin-bottom: 0.5rem;
+}
 .oss-card-body {
     flex-grow: 1;
     color: #555;
@@ -471,9 +473,38 @@ td .btn-apagar { color: #dc3545; }
     z-index: 1;
     content: "";
 }
+.modal-body .bg-light {
+    background-color: #fbfcfe;
+    height: 10rem
+}
 
+.modal-header {
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: top;
+    border-top: 1px solid #eee;
+    width: 50rem;
+    height: 5rem;
+}
+.modal-content {
+    width: 10rem;
+    height: 50rem;
+    border-radius: 15px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+   
+}
 /* Estilos para Modais e Formulários Internos */
-
+.modal-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #2A4687;
+    display: flex;
+    justify-content: top;
+    align-items: top;
+}
 .modal-body .form-control,
 .modal-body .form-select {
     padding: 12px !important;
@@ -486,7 +517,6 @@ td .btn-apagar { color: #dc3545; }
     box-shadow: 0 0 8px rgba(42, 70, 135, 0.2) !important;
 }
 
-/* NOVO: Estilo para campos readonly no modal para maior clareza */
 .modal-body input[readonly],
 .modal-body textarea[readonly] {
     background-color: #e9ecef; /* Cor padrão do Bootstrap para inputs desabilitados */
@@ -529,7 +559,6 @@ td .btn-apagar { color: #dc3545; }
     border-bottom: 2px solid #eee;
     width: 100%;
 }
-/* NOVO: Estilos para corrigir a paginação da tabela (DataTables) */
 
 .dataTables_wrapper .dataTables_paginate {
     float: right;

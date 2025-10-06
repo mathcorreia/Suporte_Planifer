@@ -19,10 +19,13 @@ if ($conn === false) {
 // Lista de tabelas que contêm dados de utilizador e podem ser limpas com segurança.
 // A tabela SGM_TAGStatus é excluída propositadamente para manter os status básicos do sistema.
 $tabelas_para_limpar = [
+    "SGM_Ativos",
     "SGM_OS_Atendimentos",
     "SGM_OS_Pecas",
-    
+    "SGM_OS_Status",
     "SGM_OS",
+    "SGM_Melhorias",
+    
   
 ];
 

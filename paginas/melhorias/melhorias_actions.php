@@ -1,79 +1,113 @@
 <?php
+// Habilita a exibição de erros para depuração
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
-require_once __DIR__ . '/../../database/config.php';
+
+// Define o tipo de conteúdo da resposta como JSON
 header('Content-Type: application/json');
 
-$action = $_POST['action'] ?? '';
+// Inclui o arquivo de configuração e conexão com o banco de dados
+require_once __DIR__ . '/../../database/config.php';
 
-if ($action === 'get_open') {
-    $sql = "SELECT 
-                ID_Melhoria as id_melhoria, 
-                Titulo_Solicitacao as titulo_solicitacao,
-                Codigo_Solicitante as codigo_solicitante,
-                Data_Criacao as data_criacao,
-                Status as status
-            FROM SGM_Melhorias 
-            WHERE Status = 'Em Aberto' 
-            ORDER BY Data_Criacao DESC";
-    $stmt = sqlsrv_query($conn, $sql);
-    $data = [];
-    if ($stmt) {
-        while ($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
-            $data[] = $row;
+// Verifica se a conexão foi bem-sucedida
+if ($conn === false) {
+    echo json_encode(["sucesso" => false, "mensagem" => "Falha na conexão com o banco de dados."]);
+    exit;
+}
+
+$action = $_REQUEST['action'] ?? '';
+
+switch ($action) {
+
+    case 'get_open':
+        $sql = "SELECT melhoria_id AS id, titulo, status, prioridade, solicitante, data_criacao 
+                FROM SGM_Melhorias 
+                WHERE status NOT IN ('Implementada', 'Rejeitada') 
+                ORDER BY CASE prioridade WHEN 'Alta' THEN 1 WHEN 'Media' THEN 2 ELSE 3 END, data_criacao ASC";
+        
+        $stmt = sqlsrv_query($conn, $sql);
+        $data = [];
+        if ($stmt) {
+            while ($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
+                if ($row['data_criacao'] instanceof DateTime) {
+                    $row['data_criacao'] = $row['data_criacao']->format('d/m/Y');
+                }
+                $data[] = $row;
+            }
         }
-    } else {
-        echo json_encode(["erro" => "Falha na consulta SQL.", "details" => sqlsrv_errors()]);
-        exit;
-    }
-    echo json_encode($data);
-}
-elseif ($action === 'save') {
-    $id = $_POST['id_melhoria'] ?? '';
-    
-    $params = [
-        'titulo_solicitacao' => $_POST['titulo_solicitacao'] ?? '',
-        'descricao_detalhada' => $_POST['descricao_detalhada'] ?? '',
-        'codigo_solicitante' => $_POST['codigo_solicitante'] ?? null,
-    ];
+        echo json_encode($data);
+        break;
 
-    if (!empty($id)) {
-        // Atualiza solicitação existente
-        $sql = "UPDATE SGM_Melhorias SET Titulo_Solicitacao = ?, Descricao_Detalhada = ?, Codigo_Solicitante = ? WHERE ID_Melhoria = ?";
-        $query_params = array_values($params);
-        $query_params[] = $id;
-        $stmt = sqlsrv_query($conn, $sql, $query_params);
-        $mensagem_sucesso = "Solicitação de melhoria atualizada com sucesso!";
-    } else {
-        // Insere nova solicitação
-        $sql = "INSERT INTO SGM_Melhorias (Titulo_Solicitacao, Descricao_Detalhada, Codigo_Solicitante, Data_Criacao, Status) VALUES (?, ?, ?, ?, 'Em Aberto')";
-        $params[] = date('Y-m-d H:i:s');
-        $stmt = sqlsrv_query($conn, $sql, array_values($params));
-        $mensagem_sucesso = "Solicitação de melhoria criada com sucesso!";
-    }
-    
-    if ($stmt) {
-        echo json_encode(["sucesso" => true, "mensagem" => $mensagem_sucesso]);
-    } else {
-        echo json_encode(["sucesso" => false, "mensagem" => "Erro ao salvar a solicitação.", "details" => sqlsrv_errors()]);
-    }
+    case 'get_all':
+        $sql = "SELECT melhoria_id AS id, titulo, status, prioridade, solicitante, data_criacao 
+                FROM SGM_Melhorias ORDER BY data_criacao DESC";
+        $stmt = sqlsrv_query($conn, $sql);
+        $data = [];
+        if ($stmt) {
+            while ($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
+                if ($row['data_criacao'] instanceof DateTime) {
+                    $row['data_criacao'] = $row['data_criacao']->format('d/m/Y');
+                }
+                $data[] = $row;
+            }
+        }
+        echo json_encode($data);
+        break;
+
+    case 'get_details':
+        $id = $_GET['id'] ?? 0;
+        $sql = "SELECT * FROM SGM_Melhorias WHERE melhoria_id = ?";
+        $stmt = sqlsrv_query($conn, $sql, [$id]);
+        $data = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
+        echo json_encode($data);
+        break;
+
+    case 'save':
+        $id = $_POST['melhoria_id'] ?? null;
+        
+        // Se um ID foi enviado, a ação é de ATUALIZAÇÃO (APENAS STATUS)
+        if (!empty($id)) {
+            $status = $_POST['status'] ?? null;
+            if (empty($status)) {
+                echo json_encode(["sucesso" => false, "mensagem" => "O status é obrigatório para atualização."]);
+                exit;
+            }
+            $sql = "UPDATE SGM_Melhorias SET 
+                        status = ?, 
+                        data_atualizacao = GETDATE() 
+                    WHERE melhoria_id = ?";
+            $params = [$status, $id];
+            $mensagem = "Status da solicitação atualizado com sucesso!";
+        } 
+        // Se não há ID, a ação é de CRIAÇÃO (salva todos os campos)
+        else {
+            $titulo = $_POST['titulo'] ?? null;
+            $descricao = $_POST['descricao_melhoria'] ?? null;
+            $area = $_POST['area_afetada'] ?? null;
+            $solicitante = $_POST['solicitante'] ?? null;
+            $tipo = $_POST['tipo_melhoria'] ?? null;
+            $prioridade = $_POST['prioridade'] ?? null;
+
+            $sql = "INSERT INTO SGM_Melhorias 
+                        (titulo, descricao_melhoria, area_afetada, solicitante, tipo_melhoria, prioridade) 
+                    VALUES (?, ?, ?, ?, ?, ?)";
+            $params = [$titulo, $descricao, $area, $solicitante, $tipo, $prioridade];
+            $mensagem = "Solicitação de melhoria criada com sucesso!";
+        }
+        
+        $stmt = sqlsrv_query($conn, $sql, $params);
+        
+        if ($stmt) {
+            echo json_encode(["sucesso" => true, "mensagem" => $mensagem]);
+        } else {
+            echo json_encode(["sucesso" => false, "mensagem" => "Falha ao salvar a solicitação.", "detalhes" => sqlsrv_errors()]);
+        }
+        break;
+
+    default:
+        echo json_encode(["sucesso" => false, "mensagem" => "Ação desconhecida."]);
+        break;
 }
-elseif ($action === 'delete') {
-    $id = $_POST['id_melhoria'] ?? '';
-    if (empty($id)) {
-        echo json_encode(["sucesso" => false, "erro" => "ID da solicitação não informado"]);
-        exit;
-    }
-    $sql = "DELETE FROM SGM_Melhorias WHERE ID_Melhoria = ?";
-    $stmt = sqlsrv_query($conn, $sql, [$id]);
-    if ($stmt) {
-        echo json_encode(["sucesso" => true, "mensagem" => "Solicitação apagada com sucesso!"]);
-    } else {
-        echo json_encode(["sucesso" => false, "mensagem" => "Erro ao apagar solicitação.", "details" => sqlsrv_errors()]);
-    }
-}
-else {
-    echo json_encode(["erro" => "Ação inválida para solicitações de melhoria"]);
-}
-exit;
+
+sqlsrv_close($conn);
 ?>
